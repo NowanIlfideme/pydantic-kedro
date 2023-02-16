@@ -1,0 +1,106 @@
+# See https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
+[build-system]
+requires = ["setuptools>=61.0.0", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pydantic-kedro"
+description = "Kedro"
+readme = "README.md"
+requires-python = ">=3.9"
+dynamic = ["version"]
+keywords = ["pydantic", "kedro", "fsspec"]
+
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=1.9.2",
+    "pydantic-yaml",
+    "kedro",
+    "fsspec",
+    "fusepy",
+    "cloudpickle",
+]
+# Add url = "https://github.com/NowanIlfideme/pydantic-kedro"
+
+[project.optional-dependencies]
+dev = [
+    "setuptools>=61.0.0",
+    "setuptools-scm[toml]>=6.2",
+    "pre-commit>=2.20.0",
+    "black>=22.6.0",
+    "flake8>=5.0.4",
+    "flake8-pyproject>=1.1.0",
+    "mypy>=0.991",
+    "pytest>=7.1.2",
+    "isort>=5.10.1",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pymdown-extensions",
+    "pygments",
+]
+
+[project.scripts]
+
+[tool.setuptools]
+zip-safe = false
+package-dir = { "" = "src" }
+packages = ["pydantic_kedro"]
+
+[tool.setuptools.package-data]
+
+[tool.setuptools.dynamic]
+version = { attr = "pydantic_kedro.version.__version__" }
+
+[tool.setuptools_scm]
+
+[tool.flake8]
+ignore = ['E203', 'E231', 'W503']
+exclude = [".git", "src/test"]
+max-line-length = 105
+max-doc-length = 105
+per-file-ignores = "__init__.py:F401"
+count = true
+
+[tool.black]
+line-length = 105
+target-version = ['py39']
+extend-exclude = [".git"]
+
+[tool.isort]
+profile = "black"
+skip = [".git"]
+
+[tool.pytest.ini_options]
+# Docs: https://docs.pytest.org/en/7.1.x/reference/customize.html#pyproject-toml
+minversion = "6.0"
+testpaths = ["src/tests"]
+
+
+[tool.mypy]
+# Docs: https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
+python_version = "3.9"
+namespace_packages = true
+warn_unused_configs = true
+warn_return_any = false
+files = ["src/pydantic_kedro"]
+exclude = "src/tests"
+
+[[tool.mypy.overrides]]
+module = ["pydantic_kedro.*"]
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["setuptools", "setuptools_scm", "fsspec.*", "cloudpickle", "fusepy"]
+ignore_missing_imports = true
