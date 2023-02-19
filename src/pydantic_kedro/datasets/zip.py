@@ -65,7 +65,7 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
             with fsspec.open(filepath, mode="wb") as zip_file:
                 zip_fs = ZipFileSystem(fo=zip_file, mode="w")  # type: ignore
                 m_zip = zip_fs.get_mapper()
-                for k in m_zip.keys():
+                for k in m_local.keys():
                     m_zip[k] = m_local[k]
                 zip_fs.close()
 
