@@ -18,10 +18,16 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     Please note that the Pydantic model must not have any JSON-unfriendly fields.
 
-    Example:
-    ::
+    Example
+    -------
+    ```python
+    class MyModel(BaseModel):
+        x: str
 
-        >>> PydanticJsonDataSet(filepath='/path/to/model.json')
+    ds = PydanticJsonDataSet('memory://path/to/model.json')  # using memory to avoid tempfile
+    ds.save(MyModel(x="example"))
+    assert ds.load().x == "example"
+    ```
     """
 
     def __init__(self, filepath: str) -> None:

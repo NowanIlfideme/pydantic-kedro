@@ -1,4 +1,4 @@
-"""API re-export of all classes."""
+"""Kedro datasets for serializing Pydantic models."""
 
 __all__ = [
     "ArbModel",

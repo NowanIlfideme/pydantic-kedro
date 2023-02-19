@@ -16,10 +16,16 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     This allows fields with arbitrary types.
 
-    Example:
-    ::
+    Example
+    -------
+    ```python
+    class MyModel(BaseModel):
+        x: str
 
-        >>> PydanticZipDataSet(filepath='/path/to/model.zip')
+    ds = PydanticZipDataSet('memory://path/to/model.zip')  # using memory to avoid tempfile
+    ds.save(MyModel(x="example"))
+    assert ds.load().x == "example"
+    ```
     """
 
     def __init__(self, filepath: str) -> None:

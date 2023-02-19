@@ -142,10 +142,16 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     This allows fields with arbitrary types.
 
-    Example:
-    ::
+    Example
+    -------
+    ```python
+    class MyModel(BaseModel):
+        x: str
 
-        >>> PydanticFolderDataSet(filepath='/path/to/model')
+    ds = PydanticFolderDataSet('memory://path/to/model')  # using in-memory to avoid tempfile
+    ds.save(MyModel(x="example"))
+    assert ds.load().x == "example"
+    ```
     """
 
     def __init__(self, filepath: str) -> None:

@@ -11,6 +11,7 @@ use_directory_urls: false
 
 nav:
   - Overview: index.md
+  - Configuration: configuration.md
   - Reference: reference/index.md
 
 theme:
@@ -36,9 +37,12 @@ plugins:
   - search
   - autorefs
   - mkdocstrings:
+      enable_inventory: true
       handlers:
         python:
           paths: [src]
+          import: # https://mkdocstrings.github.io/usage/#cross-references-to-other-projects-inventories
+            - https://kedro.readthedocs.io/en/stable/objects.inv
           options:
             docstring_style: numpy
             show_root_heading: true
@@ -68,3 +72,9 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/NowanIlfideme/pydantic-kedro/
+
+# For live reloading, see https://www.mkdocs.org/user-guide/configuration/#live-reloading
+watch:
+  - mkdocs.yml
+  - docs
+  - src/pydantic_kedro
