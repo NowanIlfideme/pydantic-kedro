@@ -92,7 +92,7 @@ testpaths = ["src/tests"]
 [tool.mypy]
 # Docs: https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
 python_version = "3.9"
-namespace_packages = true
+namespace_packages = false
 warn_unused_configs = true
 warn_return_any = false
 files = ["src/pydantic_kedro"]
