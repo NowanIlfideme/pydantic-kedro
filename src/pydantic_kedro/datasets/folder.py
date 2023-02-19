@@ -25,7 +25,11 @@ _Bis = Union[bool, int, str, Path, None]
 
 
 class KedroDataSetSpec(BaseModel):
-    """Kedro dataset specification. This allows arbitrary extra fields, including versions."""
+    """Kedro dataset specification. This allows arbitrary extra fields, including versions.
+
+    Unfortunately, because there's no standard on how to specify "file paths", this will likely fail
+    in many cases where it "should" work.
+    """
 
     type_: str = Field(alias="type")
     relative_path: str
@@ -56,17 +60,27 @@ class KedroDataSetSpec(BaseModel):
     def to_dataset(
         self, base_path: str, load_version: Optional[str] = None, save_version: Optional[str] = None
     ) -> AbstractDataSet:
-        """Builds the DataSet object."""
+        """Builds the DataSet object.
+
+        This assumes the local path is called `filepath`.
+        """
         fsp = strip_protocol(base_path)  # I mean, this should be a local path...
         new_path = f"{fsp}/{self.relative_path}"
         config = self.dict(exclude={"relative_path"}, by_alias=True)
         config = {"type": self.type_, **self.args}
         config["filepath"] = new_path
-        kls, params = parse_dataset_definition(
+        kls, params_raw = parse_dataset_definition(
             config,
             load_version=load_version,  # type: ignore
             save_version=save_version,  # type: ignore
         )
+
+        # Ensure parameters exist on the dataset
+        sig = inspect.signature(kls)
+        params = {}
+        for k, v in params_raw.items():
+            if k in sig.parameters:
+                params[k] = v
         return kls(**params)
 
 
