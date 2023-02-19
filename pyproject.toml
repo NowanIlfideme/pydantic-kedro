@@ -22,12 +22,10 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pydantic>=1.9.2",
-    "pydantic-yaml",
+    "pydantic>=1.10.0,<2",
+    # "pydantic-yaml",  # not currently needed
     "kedro",
     "fsspec",
-    "fusepy",
-    "cloudpickle",
 ]
 # Add url = "https://github.com/NowanIlfideme/pydantic-kedro"
 
