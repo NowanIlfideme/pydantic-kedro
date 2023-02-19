@@ -249,6 +249,10 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
             for k, v in kedro_map.items():
                 if isinstance(obj, k):
                     return v(path)
+            warnings.warn(
+                f"No dataset defined for {get_import_name(type(obj))} in `Config.kedro_map`;"
+                f" using `Config.kedro_default`: {kedro_default}"
+            )
             return kedro_default(path)
 
         # We need to create `model_info` and `catalog`

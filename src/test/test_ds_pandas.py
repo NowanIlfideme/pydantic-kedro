@@ -18,8 +18,8 @@ class _PdModel(ArbModel):
         kedro_map = {pd.DataFrame: ParquetDataSet}
 
 
-class FlatPandasModel(_PdModel):
-    """Flat model that tests Pandas using Parquet dataset."""
+class FlatPandasModel(ArbModel):
+    """Flat model that tests Pandas using Picke dataset (default)."""
 
     df: pd.DataFrame
     val: int
@@ -28,8 +28,12 @@ class FlatPandasModel(_PdModel):
 class NestedPandasModel(_PdModel):
     """Flat model that tests Pandas using Parquet and Pickle datasets."""
 
-    class Nested(ArbModel):
-        """Nested model, configured to use Pickle (notice ArbModel, not Parquet!)"""
+    class Inner(ArbModel):
+        """Nested model (notice `ArbModel`, not `_PdModel`) but will use `_PdModel` config anyways.
+
+        This is because the NestedPandasModel is the one being serialized.
+        TODO: This is something to reconsider in the future.
+        """
 
         z: pd.DataFrame = dfx
 
@@ -38,19 +42,20 @@ class NestedPandasModel(_PdModel):
     df: pd.DataFrame = dfx
     df_map: dict[int, pd.DataFrame] = {1: dfx}
     df_list: list[pd.DataFrame] = [dfx]
-    nested: Nested = Nested()
+    nested: Inner = Inner()
     onion: Union[pd.DataFrame, Dict[str, Any]] = dfx
     any_model: Any = None
 
 
 @pytest.mark.parametrize("kls", [PydanticFolderDataSet, PydanticZipDataSet])
 def test_pandas_flat_model(kls: Kls, tmpdir):
-    """Test roundtripping of the flat Pandas model."""
+    """Test roundtripping of the flat Pandas model, using default Pickle dataset."""
     mdl = FlatPandasModel(df=dfx, val=1)
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
     for path in paths:
         ds: Kls = kls(path)  # type: ignore
-        ds.save(mdl)
+        with pytest.warns(match="No dataset defined for.*"):
+            ds.save(mdl)
         m2 = ds.load()
         assert isinstance(m2, FlatPandasModel)
         assert m2.df.equals(mdl.df)
@@ -58,7 +63,7 @@ def test_pandas_flat_model(kls: Kls, tmpdir):
 
 @pytest.mark.parametrize("kls", [PydanticFolderDataSet, PydanticZipDataSet])
 def test_pandas_nested_model(kls: Kls, tmpdir):
-    """Test roundtripping of the nested Pandas model."""
+    """Test roundtripping of the nested Pandas model, using Parquet dataset."""
     mdl = NestedPandasModel()
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
     for path in paths:
