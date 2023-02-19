@@ -9,7 +9,9 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union
 from uuid import uuid4
 
 import fsspec
+from fsspec import AbstractFileSystem
 from fsspec.core import strip_protocol
+from fsspec.implementations.local import LocalFileSystem
 from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io.core import AbstractDataSet, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
@@ -155,6 +157,28 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         """
         self._filepath = filepath
 
+    def _save(self, data: BaseModel) -> None:
+        """Saves Pydantic model to the filepath."""
+        fs: AbstractFileSystem = fsspec.open(self._filepath).fs  # type: ignore
+        if isinstance(fs, LocalFileSystem):
+            self._save_local(data, self._filepath)
+        else:
+            from tempfile import TemporaryDirectory
+
+            with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
+                self._save_local(data, tmpdir)
+                # Copy to remote
+                m_local = fsspec.get_mapper(tmpdir)
+                m_remote = fsspec.get_mapper(self._filepath, create=True)
+                for k, v in m_local.items():
+                    m_remote[k] = v
+
+            # Close (this might be required for some filesystems)
+            try:
+                fs.close()  # type: ignore
+            except AttributeError:
+                pass
+
     def _load(self) -> BaseModel:
         """Loads Pydantic model from the filepath.
 
@@ -162,7 +186,29 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         -------
         Pydantic model.
         """
-        filepath = self._filepath
+        fs: AbstractFileSystem = fsspec.open(self._filepath).fs  # type: ignore
+        if isinstance(fs, LocalFileSystem):
+            return self._load_local(self._filepath)
+        else:
+            from tempfile import TemporaryDirectory
+
+            with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
+                # Copy from remote... yes, I know, not ideal!
+                m_remote = fsspec.get_mapper(self._filepath)
+                m_local = fsspec.get_mapper(tmpdir)
+                for k, v in m_remote.items():
+                    m_local[k] = v
+
+                # Load locally
+                return self._load_local(tmpdir)
+
+    def _load_local(self, filepath: str) -> BaseModel:
+        """Loads Pydantic model from the local filepath.
+
+        Returns
+        -------
+        Pydantic model.
+        """
         with fsspec.open(f"{filepath}/meta.json") as f:
             meta = FolderFormatMetadata.parse_raw(f.read())  # type: ignore
 
@@ -183,10 +229,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         res = model_cls.parse_obj(model_data)
         return res
 
-    def _save(self, data: BaseModel) -> None:
-        """Saves Pydantic model to the filepath."""
-        filepath = self._filepath
-
+    def _save_local(self, data: BaseModel, filepath: str) -> None:
         # Prepare fields for final metadata
         kls = type(data)
         model_class_str = get_import_name(kls)

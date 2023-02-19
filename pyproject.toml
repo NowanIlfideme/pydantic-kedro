@@ -42,6 +42,7 @@ dev = [
     "mypy>=0.991",
     "pytest>=7.1.2",
     "isort>=5.10.1",
+    "kedro[pandas]",             # needed for testing
 ]
 docs = [
     "mkdocs",

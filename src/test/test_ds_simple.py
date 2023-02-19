@@ -31,7 +31,7 @@ Kls = Union[PydanticFolderDataSet, PydanticJsonDataSet, PydanticZipDataSet]
 @pytest.mark.parametrize("kls", [PydanticJsonDataSet, PydanticFolderDataSet, PydanticZipDataSet])
 def test_simple_model_rt(mdl: SimpleTestModel, kls: Kls, tmpdir):
     """Tests whether a simple model survives roundtripping."""
-    paths = [f"{tmpdir}/model_on_disk", "memory://model_in_memory"]
+    paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
     for path in paths:
         ds: Kls = kls(path)  # type: ignore
         ds.save(mdl)

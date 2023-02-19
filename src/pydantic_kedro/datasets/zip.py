@@ -45,8 +45,8 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
             with fsspec.open(filepath) as zip_file:
                 zip_fs = ZipFileSystem(fo=zip_file)  # type: ignore
                 m_zip = zip_fs.get_mapper()
-                for k in m_zip.keys():
-                    m_local[k] = m_zip[k]
+                for k, v in m_zip.items():
+                    m_local[k] = v
                 zip_fs.close()
             # Load folder dataset
             pfds = PydanticFolderDataSet(tmpdir)
@@ -65,8 +65,8 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
             with fsspec.open(filepath, mode="wb") as zip_file:
                 zip_fs = ZipFileSystem(fo=zip_file, mode="w")  # type: ignore
                 m_zip = zip_fs.get_mapper()
-                for k in m_local.keys():
-                    m_zip[k] = m_local[k]
+                for k, v in m_local.items():
+                    m_zip[k] = v
                 zip_fs.close()
 
     def _describe(self) -> Dict[str, Any]:
