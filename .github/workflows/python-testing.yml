@@ -10,16 +10,15 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  lint-test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - "3.7"
+          - "3.9"
           - "3.10"
         lib-pydantic:
-          - "1.7.4"
           - "1.8.2"
           - "1.9.0"
           - "1.10.0"
@@ -46,4 +45,4 @@ jobs:
           pytest
       - name: Test with mypy
         run: |
-          mypy -p pydantic_kedro
+          mypy
