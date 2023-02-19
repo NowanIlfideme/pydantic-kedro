@@ -2,7 +2,7 @@
 
 import json
 from pathlib import PurePosixPath
-from typing import Any, Dict, TypeVar
+from typing import Any, Dict, no_type_check
 
 import fsspec
 from fsspec import AbstractFileSystem
@@ -10,12 +10,10 @@ from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_pa
 from pydantic import BaseModel, create_model, parse_obj_as
 from pydantic.utils import import_string
 
-T_Pyd = TypeVar("T_Pyd", bound=BaseModel)
-
 KLS_MARK_STR = "class"
 
 
-class PydanticJsonDataSet(AbstractDataSet[T_Pyd, T_Pyd]):
+class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """A Pydantic model with JSON-based load/save.
 
     Please note that the Pydantic model must not have any JSON-unfriendly fields.
@@ -39,7 +37,7 @@ class PydanticJsonDataSet(AbstractDataSet[T_Pyd, T_Pyd]):
         self._filepath = PurePosixPath(path)
         self._fs: AbstractFileSystem = fsspec.filesystem(self._protocol)
 
-    def _load(self) -> T_Pyd:
+    def _load(self) -> BaseModel:
         """Loads Pydantic model from the filepath.
 
         Returns
@@ -60,7 +58,8 @@ class PydanticJsonDataSet(AbstractDataSet[T_Pyd, T_Pyd]):
         res = parse_obj_as(pyd_kls, dct)
         return res  # type: ignore
 
-    def _save(self, data: T_Pyd) -> None:
+    @no_type_check
+    def _save(self, data: BaseModel) -> None:
         """Saves Pydantic model to the filepath."""
         # Add metadata to our Pydantic model
         pyd_kls = type(data)
