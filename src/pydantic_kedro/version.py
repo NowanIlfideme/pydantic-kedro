@@ -5,7 +5,7 @@ __all__ = ["__version__"]
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("idea")
+    __version__ = version("pydantic-kedro")
 except PackageNotFoundError:
     try:
         from setuptools_scm import get_version
