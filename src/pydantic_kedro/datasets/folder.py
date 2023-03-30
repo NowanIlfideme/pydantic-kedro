@@ -2,6 +2,7 @@
 
 import inspect
 import json
+import logging
 import warnings
 from copy import deepcopy
 from pathlib import Path
@@ -24,6 +25,8 @@ DATA_PLACEHOLDER = "__DATA_PLACEHOLDER__"
 
 JsonPath = str  # not a "real" JSON Path, but just `.`-separated
 _Bis = Union[bool, int, str, Path, None]
+
+logger = logging.getLogger(__name__)
 
 
 class KedroDataSetSpec(BaseModel):
@@ -56,7 +59,7 @@ class KedroDataSetSpec(BaseModel):
             if k in sig.parameters:
                 clean_args[k] = v
             else:
-                warnings.warn(f"Ignoring dataset {type(ds).__name__} keyword {k!r} = {v!r}")
+                logger.info(f"Ignoring dataset {type(ds).__name__} keyword {k!r} = {v!r}")
         return cls(type=get_import_name(type(ds)), relative_path=relative_path, args=clean_args)
 
     def to_dataset(
