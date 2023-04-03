@@ -29,7 +29,6 @@ repos:
     rev: "v0.0.260"
     hooks:
       - id: ruff
-  #     - id: flake8-pyproject
   - repo: https://github.com/pre-commit/mirrors-mypy
     # NOTE: This passes ALL files to `mypy`. mypy will cache these.
     # However, we must ignore all missing imports, because pre-commit runs in a separate env
