@@ -32,13 +32,11 @@ urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
 dev = [
     "setuptools>=61.0.0",
     "setuptools-scm[toml]>=6.2",
-    "pre-commit>=2.20.0",
-    "black>=22.6.0",
-    "flake8>=5.0.4",
-    "flake8-pyproject>=1.1.0",
-    "mypy>=1.0",
-    "pytest>=7.1.2",
-    "isort>=5.10.1",
+    "pre-commit==2.21.0",
+    "black==23.3.0",
+    "ruff==0.0.260",
+    "mypy==1.1.1",
+    "pytest==7.2.2",
     # required for testing
     "kedro[pandas]",
 ]
@@ -64,13 +62,15 @@ version = { attr = "pydantic_kedro.version.__version__" }
 
 [tool.setuptools_scm]
 
-[tool.flake8]
-ignore = ['E203', 'E231', 'W503']
-exclude = [".git", "src/test"]
-max-line-length = 105
-max-doc-length = 105
-per-file-ignores = "__init__.py:F401"
-count = true
+[tool.ruff]
+line-length = 105
+src = ["src"]
+select = [
+    "E", # pycodestyle
+    "F", # pyflakes
+    # "UP", # pyupgrade
+    # "D",  # pydocstyle
+]
 
 [tool.black]
 line-length = 105

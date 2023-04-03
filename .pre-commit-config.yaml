@@ -24,16 +24,11 @@ repos:
     hooks:
       - id: black
     # consider also black-jupyter
-  - repo: https://github.com/pycqa/flake8
-    # docs: https://flake8.pycqa.org/en/latest/user/using-hooks.html?highlight=commit
-    rev: "5.0.4"
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: "v0.0.260"
     hooks:
-      - id: flake8
-        additional_dependencies: [flake8-pyproject]
-  # - repo: https://github.com/john-hen/flake8-pyproject
-  #   # alternate to above, however it should work with flake8-pyproject as an additional dep
-  #   rev: "1.0.1"
-  #   hooks:
+      - id: ruff
   #     - id: flake8-pyproject
   - repo: https://github.com/pre-commit/mirrors-mypy
     # NOTE: This passes ALL files to `mypy`. mypy will cache these.
