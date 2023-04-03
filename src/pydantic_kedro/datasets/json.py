@@ -18,7 +18,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     Please note that the Pydantic model must not have any JSON-unfriendly fields.
 
-    Example
+    Example:
     -------
     ```python
     class MyModel(BaseModel):
@@ -31,9 +31,9 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """
 
     def __init__(self, filepath: str) -> None:
-        """Creates a new instance of PydanticJsonDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticJsonDataSet to load/save Pydantic models for given filepath.
 
-        Args
+        Args:
         ----
         filepath : The location of the JSON file.
         """
@@ -44,7 +44,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         self._fs: AbstractFileSystem = fsspec.filesystem(self._protocol)
 
     def _load(self) -> BaseModel:
-        """Loads Pydantic model from the filepath.
+        """Load Pydantic model from the filepath.
 
         Returns
         -------
@@ -66,7 +66,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     @no_type_check
     def _save(self, data: BaseModel) -> None:
-        """Saves Pydantic model to the filepath."""
+        """Save Pydantic model to the filepath."""
         # Add metadata to our Pydantic model
         pyd_kls = type(data)
         if KLS_MARK_STR in pyd_kls.__fields__.keys():
@@ -86,5 +86,5 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
             f.write(tmp_obj.json())
 
     def _describe(self) -> Dict[str, Any]:
-        """Returns a dict that describes the attributes of the dataset."""
+        """Return a dict that describes the attributes of the dataset."""
         return dict(filepath=self._filepath, protocol=self._protocol)

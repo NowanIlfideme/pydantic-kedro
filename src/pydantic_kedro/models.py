@@ -8,7 +8,7 @@ from pydantic import BaseConfig, BaseModel
 
 
 class ArbConfig(BaseConfig):
-    """Configuration with arbitrary types allowed; see [pydantic_kedro.ArbModel][]"""
+    """Configuration with arbitrary types allowed; see [pydantic_kedro.ArbModel][]."""
 
     arbitrary_types_allowed = True
 

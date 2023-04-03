@@ -13,6 +13,7 @@ class Singleton:
     """Class that is always equal to itself (for ease of testing)."""
 
     def __eq__(self, __o: object) -> bool:
+        """Check for equality of the singleton."""
         return isinstance(__o, Singleton)
 
 
@@ -23,12 +24,15 @@ class MyStr:
     """
 
     def __init__(self, v: str):
+        """Initialize."""
         self.v = v
 
     def __eq__(self, x):
+        """Check for string equality."""
         return str(x) == str(self)
 
     def __str__(self):
+        """Return the internal string."""
         return self.v
 
 
@@ -46,6 +50,8 @@ class UserExtendedModel(ArbModel):
     """Arbitrary model, extended with the user model."""
 
     class Config(ArbModel.Config):
+        """Arbitrary model configuration."""
+
         kedro_map = {MyStr: MyStrDs}
 
     sing: Singleton = Singleton()

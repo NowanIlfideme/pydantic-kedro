@@ -49,7 +49,7 @@ class KedroDataSetSpec(BaseModel):
 
     @classmethod
     def from_dataset(cls, ds: AbstractDataSet, relative_path: str) -> "KedroDataSetSpec":
-        """Gets class from dataset."""
+        """Create spec class from dataset."""
         raw_args = ds._describe()
         # We need to actually look at the kwargs to ensure we don't pass any extra args...
         # ... because these implementations don't describe themselves correctly. Ugh.
@@ -65,7 +65,7 @@ class KedroDataSetSpec(BaseModel):
     def to_dataset(
         self, base_path: str, load_version: Optional[str] = None, save_version: Optional[str] = None
     ) -> AbstractDataSet:
-        """Builds the DataSet object.
+        """Build the DataSet object.
 
         This assumes the local path is called `filepath`.
         """
@@ -132,7 +132,7 @@ def mutate_jsp(struct: Union[Dict[str, Any], List[Any]], jsp: List[str], obj: An
 
 
 def get_import_name(obj: Any) -> str:
-    """Gets the import name for a type."""
+    """Get the import name for a type."""
     module_i = inspect.getmodule(obj)
     if module_i is None:
         raise TypeError(f"Could not find module for {obj!r}")
@@ -145,7 +145,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     This allows fields with arbitrary types.
 
-    Example
+    Example:
     -------
     ```python
     class MyModel(BaseModel):
@@ -158,16 +158,16 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """
 
     def __init__(self, filepath: str) -> None:
-        """Creates a new instance of PydanticFolderDataSet to load/save Pydantic models for given path.
+        """Create a new instance of PydanticFolderDataSet to load/save Pydantic models for given path.
 
-        Args
+        Args:
         ----
         filepath : The location of the folder.
         """
         self._filepath = filepath
 
     def _save(self, data: BaseModel) -> None:
-        """Saves Pydantic model to the filepath."""
+        """Save Pydantic model to the filepath."""
         fs: AbstractFileSystem = fsspec.open(self._filepath).fs  # type: ignore
         if isinstance(fs, LocalFileSystem):
             self._save_local(data, self._filepath)
@@ -189,7 +189,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 pass
 
     def _load(self) -> BaseModel:
-        """Loads Pydantic model from the filepath.
+        """Load Pydantic model from the filepath.
 
         Returns
         -------
@@ -212,7 +212,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 return self._load_local(tmpdir)
 
     def _load_local(self, filepath: str) -> BaseModel:
-        """Loads Pydantic model from the local filepath.
+        """Load Pydantic model from the local filepath.
 
         Returns
         -------
@@ -283,7 +283,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # This will map the data to a dataset and actually save it
 
         def visit3(obj: Any, jsp: str, base_path: str) -> Any:
-            """Maps the data to a dataset in `catalog` and actually saves it."""
+            """Map the data to a dataset in `catalog` and actually saves it."""
             if isinstance(obj, str):
                 if obj in data_map:
                     # We got a data point

@@ -16,7 +16,7 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     This allows fields with arbitrary types.
 
-    Example
+    Example:
     -------
     ```python
     class MyModel(BaseModel):
@@ -29,16 +29,16 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """
 
     def __init__(self, filepath: str) -> None:
-        """Creates a new instance of PydanticZipDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticZipDataSet to load/save Pydantic models for given filepath.
 
-        Args
+        Args:
         ----
         filepath : The location of the Zip file.
         """
         self._filepath = filepath
 
     def _load(self) -> BaseModel:
-        """Loads Pydantic model from the filepath.
+        """Load Pydantic model from the filepath.
 
         Returns
         -------
@@ -60,7 +60,7 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
         return res
 
     def _save(self, data: BaseModel) -> None:
-        """Saves Pydantic model to the filepath."""
+        """Save Pydantic model to the filepath."""
         filepath = self._filepath
         with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
             # Save folder dataset
