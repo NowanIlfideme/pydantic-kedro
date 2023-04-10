@@ -36,7 +36,7 @@ dev = [
     "black==23.3.0",
     "ruff==0.0.260",
     "mypy==1.1.1",
-    "pytest==7.2.2",
+    "pytest==7.3.0",
     # required for testing
     "kedro[pandas]",
 ]
