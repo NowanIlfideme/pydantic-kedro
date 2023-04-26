@@ -22,8 +22,6 @@ class _YamlPreLoader(BaseModel):
 class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """A Pydantic model with YAML-based load/save.
 
-    This class is only available with the 'yaml' extra (or `pydantic-yaml>=1.0.0`).
-
     Please note that the Pydantic model must be JSON-serializable.
     That means the fields are "pure" Pydantic fields,
     or you have added `json_encoders` to the model config.

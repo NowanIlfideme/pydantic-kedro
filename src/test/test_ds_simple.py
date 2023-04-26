@@ -9,9 +9,9 @@ from pydantic import BaseModel
 from pydantic_kedro import (
     PydanticFolderDataSet,
     PydanticJsonDataSet,
+    PydanticYamlDataSet,
     PydanticZipDataSet,
 )
-from pydantic_kedro.extras import INSTALLED_YAML
 
 
 class SimpleTestModel(BaseModel):
@@ -24,11 +24,7 @@ class SimpleTestModel(BaseModel):
     alter_ego: Optional[str] = None
 
 
-types = [PydanticJsonDataSet, PydanticFolderDataSet, PydanticZipDataSet]
-if INSTALLED_YAML:
-    from pydantic_kedro.datasets.yaml import PydanticYamlDataSet
-
-    types.append(PydanticYamlDataSet)
+types = [PydanticJsonDataSet, PydanticYamlDataSet, PydanticFolderDataSet, PydanticZipDataSet]
 
 
 @pytest.mark.parametrize(
@@ -44,6 +40,3 @@ def test_simple_model_rt(mdl: SimpleTestModel, kls: AbstractDataSet, tmpdir):  #
         m2 = ds.load()
         assert isinstance(m2, SimpleTestModel)
         assert m2 == mdl
-
-
-# @pytest.mark.skipif(INSTALLED_YAML, reason="Extra 'yaml' (`pydantic-yaml` library) is not installed.")
