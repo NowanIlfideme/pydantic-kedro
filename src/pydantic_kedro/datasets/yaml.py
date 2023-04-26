@@ -1,20 +1,26 @@
-"""JSON dataset definition for Pydantic."""
+"""YAML dataset definition for Pydantic."""
 
-import json
 from pathlib import PurePosixPath
 from typing import Any, Dict, no_type_check
 
 import fsspec
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
-from pydantic import BaseModel, create_model, parse_obj_as
+from pydantic import BaseModel, Field, create_model
 from pydantic.utils import import_string
+from pydantic_yaml import parse_yaml_file_as, to_yaml_file
 
 KLS_MARK_STR = "class"
 
 
-class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with JSON-based load/save.
+class _YamlPreLoader(BaseModel):
+    """YAML pre-loader model."""
+
+    kls_mark_str: str = Field(alias=KLS_MARK_STR)  # type: ignore
+
+
+class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
+    """A Pydantic model with YAML-based load/save.
 
     Please note that the Pydantic model must be JSON-serializable.
     That means the fields are "pure" Pydantic fields,
@@ -26,18 +32,18 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     class MyModel(BaseModel):
         x: str
 
-    ds = PydanticJsonDataSet('memory://path/to/model.json')  # using memory to avoid tempfile
+    ds = PydanticYamlDataSet('memory://path/to/model.yaml')  # using memory to avoid tempfile
     ds.save(MyModel(x="example"))
     assert ds.load().x == "example"
     ```
     """
 
     def __init__(self, filepath: str) -> None:
-        """Create a new instance of PydanticJsonDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticYamlDataSet to load/save Pydantic models for given filepath.
 
         Args:
         ----
-        filepath : The location of the JSON file.
+        filepath : The location of the YAML file.
         """
         # parse the path and protocol (e.g. file, http, s3, etc.)
         protocol, path = get_protocol_and_path(filepath)
@@ -56,14 +62,11 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # are appended correctly for different filesystems
         load_path = get_filepath_str(self._filepath, self._protocol)
         with self._fs.open(load_path, mode="r") as f:
-            dct = json.load(f)
-        assert isinstance(dct, dict), "JSON root must be a mapping."
-        if KLS_MARK_STR not in dct.keys():
-            raise TypeError(f"Cannot determine pydantic model type, missing {KLS_MARK_STR!r}")
-        pyd_kls = import_string(dct[KLS_MARK_STR])
+            preloader = parse_yaml_file_as(_YamlPreLoader, f)
+        pyd_kls = import_string(preloader.kls_mark_str)
         assert issubclass(pyd_kls, BaseModel), f"Type must be a Pydantic model, got {type(pyd_kls)!r}."
-        dct.pop(KLS_MARK_STR)  # don't accidentally pass to proper model
-        res = parse_obj_as(pyd_kls, dct)
+        with self._fs.open(load_path, mode="r") as f:
+            res = parse_yaml_file_as(pyd_kls, f)
         return res  # type: ignore
 
     @no_type_check
@@ -85,7 +88,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)
         with self._fs.open(save_path, mode="w") as f:
-            f.write(tmp_obj.json())
+            to_yaml_file(f, tmp_obj)
 
     def _describe(self) -> Dict[str, Any]:
         """Return a dict that describes the attributes of the dataset."""

@@ -22,7 +22,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=1.10.0,<2",
-    # "pydantic-yaml",  # not currently needed
+    "pydantic-yaml>=1.0.0a2",
     "kedro",
     "fsspec",
 ]
