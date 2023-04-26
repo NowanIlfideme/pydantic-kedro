@@ -16,7 +16,7 @@ KLS_MARK_STR = "class"
 class _YamlPreLoader(BaseModel):
     """YAML pre-loader model."""
 
-    kls_mark_str: str = Field(alias=KLS_MARK_STR)
+    kls_mark_str: str = Field(alias=KLS_MARK_STR)  # type: ignore
 
 
 class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
