@@ -16,7 +16,12 @@ from fsspec.implementations.local import LocalFileSystem
 from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io.core import AbstractDataSet, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
-from pydantic.utils import import_string
+
+from pydantic_kedro._compat import (
+    apply_model_json_encoder,
+    get_config_attr,
+    import_string,
+)
 
 # __all__ = ["PydanticFolderDataSet"]
 
@@ -247,11 +252,9 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
         # These are used to make datasets for various types
         # See the `kls.Config` class - this is inherited
-        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = getattr(
-            kls.__config__, "kedro_map", {}
-        )
-        kedro_default: Callable[[str], AbstractDataSet] = getattr(
-            kls.__config__, "kedro_default", PickleDataSet
+        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = get_config_attr(kls, "kedro_map", {})
+        kedro_default: Callable[[str], AbstractDataSet] = get_config_attr(
+            kls, "kedro_default", PickleDataSet
         )
 
         def make_ds_for(obj: Any, path: str) -> AbstractDataSet:
@@ -271,7 +274,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         def fake_encoder(obj: Any) -> Any:
             """Encode data objects as UUID strings, populating `data_map` as a side-effect."""
             try:
-                return kls.__json_encoder__(obj)
+                return apply_model_json_encoder(kls, obj)
             except TypeError:
                 val = f"{starter}__{uuid4()}".replace("-", "")
                 data_map[val] = obj

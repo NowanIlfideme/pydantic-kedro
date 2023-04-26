@@ -7,8 +7,9 @@ import fsspec
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
 from pydantic import BaseModel, Field, create_model
-from pydantic.utils import import_string
 from pydantic_yaml import parse_yaml_file_as, to_yaml_file
+
+from pydantic_kedro._compat import get_field_names, import_string
 
 KLS_MARK_STR = "class"
 
@@ -74,7 +75,7 @@ class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
         """Save Pydantic model to the filepath."""
         # Add metadata to our Pydantic model
         pyd_kls = type(data)
-        if KLS_MARK_STR in pyd_kls.__fields__.keys():
+        if KLS_MARK_STR in get_field_names(pyd_kls):
             raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
         pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
         tmp_kls = create_model(

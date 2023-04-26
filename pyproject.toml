@@ -20,7 +20,12 @@ classifiers = [
     "Topic :: Software Development",
     "Typing :: Typed",
 ]
-dependencies = ["pydantic>=1.10.0", "pydantic-yaml>=1.0.0a2", "kedro", "fsspec"]
+dependencies = [
+    "pydantic>=1.10.0,<3",
+    "pydantic-yaml>=1.0.0a2",
+    "kedro",
+    "fsspec",
+]
 urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
 
 [project.optional-dependencies]
@@ -101,5 +106,12 @@ module = ["pydantic_kedro.*"]
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = ["setuptools", "setuptools_scm", "fsspec.*", "cloudpickle", "fusepy"]
+module = [
+    "setuptools",
+    "setuptools_scm",
+    "fsspec.*",
+    "cloudpickle",
+    "fusepy",
+    "ruamel",
+]
 ignore_missing_imports = true
