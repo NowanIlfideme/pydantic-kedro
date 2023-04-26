@@ -2,7 +2,7 @@
 
 Pydantic [supports models with arbitrary types](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed)
 if you specify it in the model's config.
-You can't save/load these via JSON, but you can use the other dataset types,
+You can't save/load these via JSON, but you can use the other dataset types:
 [PydanticFolderDataSet][pydantic_kedro.PydanticFolderDataSet] and
 [PydanticZipDataSet][pydantic_kedro.PydanticZipDataSet].
 
@@ -52,6 +52,21 @@ with TemporaryDirectory() as tmpdir:
     assert read_obj.foo.foo == "foofoo"
 ```
 
+> Note: The above model definition can use [`ArbModel`][pydantic_kedro.ArbModel]
+> to save keystrokes:
+>
+> ```python
+> from pydantic_kedro import ArbModel
+>
+> class MyArbitraryModel(ArbModel):
+>     """Your custom Pydantic model with JSON-unsafe fields."""
+>
+>     x: int
+>     foo: Foo
+> ```
+>
+> We will use `ArbModel` as it also gives type hints for the configuration.
+
 ## Default Behavior for Unknown Types
 
 The above code gives the following warning:
@@ -62,9 +77,64 @@ using `Config.kedro_default`:
 <class 'kedro.extras.datasets.pickle.pickle_dataset.PickleDataSet'>
 ```
 
-This is because we don't know how to serialize the object; we use `PickleDataSet`
-by default
+This is because `pydantic-kedro` doesn't know how to serialize the object.
+The default is Kedro's `PickleDataSet`, which will generally work only if the same
+Python version and libraries are installed on the client that reads the dataset.
 
 ## Defining Datasets for Types
 
-TODO
+To let `pydantic-kedro` know how to serialize a class, you need to add it to the
+`kedro_map` model config.
+
+Here's a example for [pandas](https://pandas.pydata.org/) and Pydantic V1:
+
+```python
+import pandas as pd
+from kedro.extras.datasets.pandas import ParquetDataSet
+from pydantic import validator
+from pydantic_kedro import ArbModel, PydanticZipDataSet
+
+
+class MyPandasModel(ArbModel):
+    """Model that saves a dataframe, along with some other data."""
+
+    class Config:
+        kedro_map = {pd.DataFrame: ParquetDataSet}
+
+    val: int
+    df: pd.DataFrame
+
+    @validator('df')
+    def _check_dataframe(cls, v: pd.DataFrame) -> pd.DataFrame:
+        """Ensure the dataframe is valid."""
+        assert len(v) > 0
+        return v
+
+
+dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
+m1 = MyPandasModel(df=dfx, val=1)
+
+ds = PydanticZipDataSet(f"memory://my_model.zip")
+ds.save(m1)
+
+m2 = ds.load()
+assert m2.df.equals(dfx)
+```
+
+Internally, this uses the `ParquetDataSet` to save the dataframe as an
+[Apache Parquet](https://parquet.apache.org/) file within the Zip file,
+as well as reference it from within the JSON file. That means that, unlike
+Pickle, the file isn't "fragile" and will be readable with future versions.
+
+## Known Issues
+
+1. Currently, the `Config` is not magically inherited by subclasses.
+   That means that you should explicitly inherit `YourType.Config` from `YourType`'s
+   base class if you want to override it. It also means that the `kedro_map`
+   isn't merged for subclasses; you'll need to do this explicitly for now.
+2. Only the top-level model's `Config` is taken into account when serializing
+   to a Kedro dataset, ignoring any children's configs.
+   This means that all values of a particular type are serialized the same way.
+3. `pydantic` V2 is not supported yet, but V2
+   [has a different configuration method](https://docs.pydantic.dev/blog/pydantic-v2-alpha/#changes-to-config).
+   `pydantic-kedro` might change the configuration method entirely to be more compliant.
