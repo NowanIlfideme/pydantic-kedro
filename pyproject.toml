@@ -73,6 +73,10 @@ select = [
 ]
 ignore = ["D203", "D213"] # conflicting
 
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+
 [tool.black]
 line-length = 105
 target-version = ['py39']
