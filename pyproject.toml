@@ -80,7 +80,6 @@ convention = "numpy"
 [tool.black]
 line-length = 105
 target-version = ['py39']
-extend-exclude = [".git"]
 
 [tool.isort]
 profile = "black"
