@@ -41,3 +41,6 @@ jobs:
       - name: Test with mypy
         run: |
           mypy
+      - name: Check Markdown (Optional)
+        uses: DavidAnson/markdownlint-cli2-action@v9
+        continue-on-error: true

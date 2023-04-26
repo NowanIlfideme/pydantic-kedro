@@ -1,0 +1,2 @@
+# Configuration for markdownlint, specifically markdownlint-cli2
+MD052: false # allow things like [PydanticJsonDataSet][pydantic_kedro.PydanticJsonDataSet]
