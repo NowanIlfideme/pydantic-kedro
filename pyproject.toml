@@ -48,7 +48,7 @@ docs = [
     "pymdown-extensions",
     "pygments",
 ]
-yaml = ["pydantic-yaml>=1.0.0a1"]
+yaml = ["pydantic-yaml>=1.0.0a2"]
 
 [project.scripts]
 
