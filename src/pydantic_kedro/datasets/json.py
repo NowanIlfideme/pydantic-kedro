@@ -16,7 +16,9 @@ KLS_MARK_STR = "class"
 class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """A Pydantic model with JSON-based load/save.
 
-    Please note that the Pydantic model must not have any JSON-unfriendly fields.
+    Please note that the Pydantic model must be JSON-serializable.
+    That means the fields are "pure" Pydantic fields,
+    or you have added `json_encoders` to the model config.
 
     Example:
     -------
