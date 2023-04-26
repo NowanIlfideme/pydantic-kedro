@@ -20,12 +20,7 @@ classifiers = [
     "Topic :: Software Development",
     "Typing :: Typed",
 ]
-dependencies = [
-    "pydantic>=1.10.0,<2",
-    "pydantic-yaml>=1.0.0a2",
-    "kedro",
-    "fsspec",
-]
+dependencies = ["pydantic>=1.10.0", "pydantic-yaml>=1.0.0a2", "kedro", "fsspec"]
 urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
 
 [project.optional-dependencies]
