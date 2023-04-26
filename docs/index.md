@@ -22,6 +22,7 @@ and [Datasets](https://docs.kedro.org/en/stable/data/kedro_io.html).
 
 If you have a JSON-safe Pydantic model, you can use a
 [PydanticJsonDataSet][pydantic_kedro.PydanticJsonDataSet]
+or [PydanticYamlDataSet][pydantic_kedro.PydanticYamlDataSet]
 to save your model to any `fsspec`-supported location:
 
 ```python
@@ -47,7 +48,11 @@ read_obj = ds.load()
 assert read_obj.x == 1
 ```
 
-Note that specifying [custom JSON encoders](https://docs.pydantic.dev/usage/exporting_models/#json_encoders) will work as usual.
+> Note: YAML support is enabled with the `'yaml'` extra, i.e.
+> `pip install pydantic-kedro[yaml]`
+> or by separately installing `pydantic-yaml>=1.0.0` of the appropriate version.
+
+Note that specifying [custom JSON encoders](https://docs.pydantic.dev/usage/exporting_models/#json_encoders) will work as usual, [even for YAML models](https://pydantic-yaml.readthedocs.io/en/latest/).
 
 However, if your custom type is difficult or impossible to encode/decode via
 JSON, read on to [Arbitrary Types](./arbitrary_types.md).
