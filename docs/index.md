@@ -4,15 +4,25 @@ Advanced serialization for [Pydantic](https://docs.pydantic.dev/) models
 via [Kedro](https://kedro.readthedocs.io/en/stable/index.html) and
 [fsspec](https://filesystem-spec.readthedocs.io/en/latest/).
 
-This package implements custom Kedro "datasets" for both "pure" and "arbitrary"
-Pydantic models.
+This package implements custom Kedro DataSet types for not only "pure" (JSON-serializable)
+Pydantic models, but also models with [`arbitrary_types_allowed`](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed).
 
-## Examples
+Keep reading for a basic tutorial,
+or check out the [API Reference](reference/index.md) for auto-generated docs.
 
-### "Pure" Pydantic Models
+## Pre-requisites
 
-This example works for "pure", JSON-safe Pydantic models via
-[PydanticJsonDataSet][pydantic_kedro.PydanticJsonDataSet]:
+To simplify the documentation, we will refer to JSON-serializable Pydantic models
+as "pure" models, while all others will be "arbitrary" models.
+
+We also assume you are familiar with [Kedro's Data Catalog](https://docs.kedro.org/en/stable/data/data_catalog.html)
+and [Datasets](https://docs.kedro.org/en/stable/data/kedro_io.html).
+
+## "Pure" Pydantic Models
+
+If you have a JSON-safe Pydantic model, you can use a
+[PydanticJsonDataSet][pydantic_kedro.PydanticJsonDataSet]
+to save your model to any `fsspec`-supported location:
 
 ```python
 from pydantic import BaseModel
@@ -21,6 +31,7 @@ from pydantic_kedro import PydanticJsonDataSet
 
 class MyPureModel(BaseModel):
     """Your custom Pydantic model with JSON-safe fields."""
+
     x: int
     y: str
 
@@ -36,32 +47,7 @@ read_obj = ds.load()
 assert read_obj.x == 1
 ```
 
-Note that specifying custom JSON encoders also will work.
+Note that specifying [custom JSON encoders](https://docs.pydantic.dev/usage/exporting_models/#json_encoders) will work as usual.
 
-### Models with Arbitrary Types
-
-Pydantic [supports models with arbitrary types](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed)
-if you specify it in the model's config.
-You can't save/load these via JSON, but you can use the other dataset types,
-[PydanticFolderDataSet][pydantic_kedro.PydanticFolderDataSet] and
-[PydanticZipDataSet][pydantic_kedro.PydanticZipDataSet]:
-
-```python
-from pydantic import BaseModel
-from pydantic_kedro import PydanticJsonDataSet
-
-# TODO
-
-class MyArbitraryModel(BaseModel):
-    """Your custom Pydantic model with JSON-unsafe fields."""
-    x: int
-    y: str
-
-# TODO
-```
-
-## Further Reading
-
-See the [configuration](configuration.md)...
-
-Check out the [API Reference](reference/index.md) for auto-generated docs.
+However, if your custom type is difficult or impossible to encode/decode via
+JSON, read on to [Arbitrary Types](./arbitrary_types.md).
