@@ -281,7 +281,8 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 return val
 
         # Roundtrip to apply the encoder and get UUID
-        rt = json.loads(data.json(encoder=fake_encoder))
+        raise NotImplementedError("Custom encoders are currently unavailable in Pydantic V2.")
+        rt = json.loads(data.json(encoder=fake_encoder))  # FIXME: Unavailable in Pydantic V2
 
         # This will map the data to a dataset and actually save it
 
