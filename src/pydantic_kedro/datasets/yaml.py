@@ -20,7 +20,7 @@ class _YamlPreLoader(BaseModel):
 
 
 class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with YAML-based load/save.
+    """Dataset for saving/loading Pydantic models, based on YAML.
 
     Please note that the Pydantic model must be JSON-serializable.
     That means the fields are "pure" Pydantic fields,
@@ -45,11 +45,17 @@ class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
         ----
         filepath : The location of the YAML file.
         """
+        # TODO: Update to just save the path and open it with `fsspec` directly
         # parse the path and protocol (e.g. file, http, s3, etc.)
         protocol, path = get_protocol_and_path(filepath)
         self._protocol = protocol
         self._filepath = PurePosixPath(path)
         self._fs: AbstractFileSystem = fsspec.filesystem(self._protocol)
+
+    @property
+    def filepath(self) -> str:
+        """File path name."""
+        return str(self._filepath)
 
     def _load(self) -> BaseModel:
         """Load Pydantic model from the filepath.
@@ -92,4 +98,4 @@ class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     def _describe(self) -> Dict[str, Any]:
         """Return a dict that describes the attributes of the dataset."""
-        return dict(filepath=self._filepath, protocol=self._protocol)
+        return dict(filepath=self.filepath, protocol=self._protocol)

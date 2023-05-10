@@ -2,6 +2,7 @@
 
 __all__ = [
     "ArbModel",
+    "PydanticAutoDataSet",
     "PydanticFolderDataSet",
     "PydanticJsonDataSet",
     "PydanticYamlDataSet",
@@ -9,6 +10,7 @@ __all__ = [
     "__version__",
 ]
 
+from .datasets.auto import PydanticAutoDataSet
 from .datasets.folder import PydanticFolderDataSet
 from .datasets.json import PydanticJsonDataSet
 from .datasets.yaml import PydanticYamlDataSet

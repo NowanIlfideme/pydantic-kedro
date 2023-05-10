@@ -14,7 +14,7 @@ KLS_MARK_STR = "class"
 
 
 class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with JSON-based load/save.
+    """Dataset for saving/loading Pydantic models, based on JSON.
 
     Please note that the Pydantic model must be JSON-serializable.
     That means the fields are "pure" Pydantic fields,
@@ -44,6 +44,11 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         self._protocol = protocol
         self._filepath = PurePosixPath(path)
         self._fs: AbstractFileSystem = fsspec.filesystem(self._protocol)
+
+    @property
+    def filepath(self) -> str:
+        """File path name."""
+        return str(self._filepath)
 
     def _load(self) -> BaseModel:
         """Load Pydantic model from the filepath.
@@ -89,4 +94,4 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     def _describe(self) -> Dict[str, Any]:
         """Return a dict that describes the attributes of the dataset."""
-        return dict(filepath=self._filepath, protocol=self._protocol)
+        return dict(filepath=self.filepath, protocol=self._protocol)

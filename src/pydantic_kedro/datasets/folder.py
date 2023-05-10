@@ -141,7 +141,7 @@ def get_import_name(obj: Any) -> str:
 
 
 class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with folder-based load/save.
+    """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a folder.
 
     This allows fields with arbitrary types.
 
@@ -165,6 +165,11 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         filepath : The location of the folder.
         """
         self._filepath = filepath
+
+    @property
+    def filepath(self) -> str:
+        """File path name."""
+        return str(self._filepath)
 
     def _save(self, data: BaseModel) -> None:
         """Save Pydantic model to the filepath."""
@@ -313,4 +318,4 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
             f.write(meta.json())  # type: ignore
 
     def _describe(self) -> Dict[str, Any]:
-        return dict(filepath=self._filepath)
+        return dict(filepath=self.filepath)

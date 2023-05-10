@@ -7,6 +7,7 @@ from kedro.io.core import AbstractDataSet
 from pydantic import BaseModel
 
 from pydantic_kedro import (
+    PydanticAutoDataSet,
     PydanticFolderDataSet,
     PydanticJsonDataSet,
     PydanticYamlDataSet,
@@ -24,7 +25,13 @@ class SimpleTestModel(BaseModel):
     alter_ego: Optional[str] = None
 
 
-types = [PydanticJsonDataSet, PydanticYamlDataSet, PydanticFolderDataSet, PydanticZipDataSet]
+types = [
+    PydanticJsonDataSet,
+    PydanticYamlDataSet,
+    PydanticFolderDataSet,
+    PydanticZipDataSet,
+    PydanticAutoDataSet,
+]
 
 
 @pytest.mark.parametrize(
