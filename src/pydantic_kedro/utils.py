@@ -49,7 +49,8 @@ def save_model(
     uri : str
         The path or URI to save the model to.
     format : {"auto", "zip", "folder", "yaml", "json"}
-        The dataset format to use. "auto" will use [PydanticAutoDataSet][].
+        The dataset format to use.
+        "auto" will use [PydanticAutoDataSet][pydantic_kedro.PydanticAutoDataSet].
     """
     if not isinstance(model, BaseModel):
         raise TypeError(f"Expected Pydantic model, but got {model!r}")
