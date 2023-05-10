@@ -16,18 +16,18 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
     base_classes = kls.mro()
     for base_i in base_classes:
         # Get config class (if it's defined)
-        cfg_i = getattr(base_i, "__config__")
+        cfg_i = getattr(base_i, "__config__", None)
         if cfg_i is None:
             continue
         # Get kedro_map (if it's defined)
-        upd = getattr(cfg_i, "kedro_map")
+        upd = getattr(cfg_i, "kedro_map", None)
         if upd is None:
             continue
         elif isinstance(upd, dict):
             # Detailed checks (to help users fix stuff)
             bad_keys = []
             bad_vals = []
-            for k, v in upd.keys():
+            for k, v in upd.items():
                 if isinstance(k, type):
                     if callable(v):
                         kedro_map[k] = v  # TODO: Check callable signature?
@@ -55,11 +55,11 @@ def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
     rev_bases = reversed(kls.mro())
     for base_i in rev_bases:
         # Get config class (if defined)
-        cfg_i = getattr(base_i, "__config__")
+        cfg_i = getattr(base_i, "__config__", None)
         if cfg_i is None:
             continue
         # Get kedro_default (if it's defined)
-        default = getattr(cfg_i, "kedro_default")
+        default = getattr(cfg_i, "kedro_default", None)
         if default is None:
             continue
         elif callable(default):
