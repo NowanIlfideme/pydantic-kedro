@@ -2,7 +2,15 @@
 
 This is where to find auto-generated Python API docs.
 
+<!-- User-focused API -->
+
 ::: pydantic_kedro.PydanticAutoDataSet
+
+::: pydantic_kedro.ArbModel
+
+::: pydantic_kedro.load_model
+
+::: pydantic_kedro.save_model
 
 <!-- For simple models -->
 
@@ -11,8 +19,6 @@ This is where to find auto-generated Python API docs.
 ::: pydantic_kedro.PydanticYamlDataSet
 
 <!-- For arbitrary models -->
-
-::: pydantic_kedro.ArbModel
 
 ::: pydantic_kedro.PydanticFolderDataSet
 

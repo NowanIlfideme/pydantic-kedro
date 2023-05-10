@@ -12,7 +12,8 @@ use_directory_urls: false
 nav:
   - Overview: index.md
   - Arbitrary Types: arbitrary_types.md
-  - API Reference: reference/index.md
+  - Standalone Usage: standalone_usage.md
+  - API Reference: reference.md
   - Implementation Details: implementation_details.md
 
 theme:

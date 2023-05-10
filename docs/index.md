@@ -8,7 +8,7 @@ This package implements custom Kedro DataSet types for not only "pure" (JSON-ser
 Pydantic models, but also models with [`arbitrary_types_allowed`](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed).
 
 Keep reading for a basic tutorial,
-or check out the [API Reference](reference/index.md) for auto-generated docs.
+or check out the [API Reference](reference.md) for auto-generated docs.
 
 ## Pre-requisites
 
@@ -56,6 +56,12 @@ my_func_node = node(my_func, outputs=["my_pydantic_model"])
 If you are using Kedro for the pipelines or data catalog, that should be enough.
 
 If you want to use these datasets stand-alone, keep on reading.
+
+## Standalone Usage
+
+The functions [save_model][pydantic_kedro.save_model] and
+[load_model][pydantic_kedro.load_model] can be used directly.
+See [the relevant docs](standalone_usage.md) for more info.
 
 ## "Pure" Pydantic Models
 
