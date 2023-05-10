@@ -12,7 +12,7 @@ from .folder import PydanticFolderDataSet
 
 
 class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with Zip-file-based load/save.
+    """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a ZIP file.
 
     This allows fields with arbitrary types.
 
@@ -35,7 +35,12 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
         ----
         filepath : The location of the Zip file.
         """
-        self._filepath = filepath
+        self._filepath = filepath  # NOTE: This is not checked when created.
+
+    @property
+    def filepath(self) -> str:
+        """File path name."""
+        return str(self._filepath)
 
     def _load(self) -> BaseModel:
         """Load Pydantic model from the filepath.
@@ -76,4 +81,4 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 zip_fs.close()
 
     def _describe(self) -> Dict[str, Any]:
-        return dict(filepath=self._filepath)
+        return dict(filepath=self.filepath)
