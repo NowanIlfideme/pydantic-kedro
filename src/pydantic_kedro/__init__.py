@@ -7,6 +7,8 @@ __all__ = [
     "PydanticJsonDataSet",
     "PydanticYamlDataSet",
     "PydanticZipDataSet",
+    "load_model",
+    "save_model",
     "__version__",
 ]
 
@@ -16,4 +18,5 @@ from .datasets.json import PydanticJsonDataSet
 from .datasets.yaml import PydanticYamlDataSet
 from .datasets.zip import PydanticZipDataSet
 from .models import ArbModel
+from .utils import load_model, save_model
 from .version import __version__
