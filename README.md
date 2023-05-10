@@ -5,10 +5,11 @@ via [Kedro](https://kedro.readthedocs.io/en/stable/index.html) and
 [fsspec](https://filesystem-spec.readthedocs.io/en/latest/).
 
 This package implements custom Kedro "datasets" for both "pure" and "arbitrary"
-Pydantic models.
+Pydantic models. You can also use it stand-alone, using Kedro just for
+serializing other object types.
 
-Please see the [docs](https://pydantic-kedro.rtfd.io) for a tutorial and
-more examples.
+Please see the [documentation](https://pydantic-kedro.rtfd.io) for a tutorial
+and more examples.
 
 ## Usage with Kedro
 
