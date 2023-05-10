@@ -8,7 +8,7 @@ This package implements custom Kedro DataSet types for not only "pure" (JSON-ser
 Pydantic models, but also models with [`arbitrary_types_allowed`](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed).
 
 Keep reading for a basic tutorial,
-or check out the [API Reference](reference/index.md) for auto-generated docs.
+or check out the [API Reference](reference.md) for auto-generated docs.
 
 ## Pre-requisites
 

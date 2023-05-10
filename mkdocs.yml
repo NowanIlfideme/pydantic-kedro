@@ -13,7 +13,7 @@ nav:
   - Overview: index.md
   - Arbitrary Types: arbitrary_types.md
   - Standalone Usage: standalone_usage.md
-  - API Reference: reference/index.md
+  - API Reference: reference.md
   - Implementation Details: implementation_details.md
 
 theme:
