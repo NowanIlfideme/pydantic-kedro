@@ -38,7 +38,10 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
             if len(bad_keys) > 0:
                 raise TypeError(f"Keys in `kedro_map` must be types, but got bad keys: {bad_keys}")
             if len(bad_vals) > 0:
-                raise TypeError(f"Values in `kedro_map` must be callable, but got bad vals: {bad_vals}")
+                raise TypeError(
+                    "Values in `kedro_map` must be callable (or types),"
+                    f" but got bad values: {bad_vals}"
+                )
         else:
             raise TypeError(
                 f"The `kedro_map` in config class {base_i.__qualname__} must be a dict, but got {upd!r}"
@@ -48,5 +51,30 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
 
 def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
     """Get default Kedro dataset creator."""
-    # FIXME: Go through bases of `kls`
-    return getattr(kls.__config__, "kedro_default", PickleDataSet)
+    # Go backwards through bases of `kls` until you find a default value
+    rev_bases = reversed(kls.mro())
+    for base_i in rev_bases:
+        # Get config class (if defined)
+        cfg_i = getattr(base_i, "__config__")
+        if cfg_i is None:
+            continue
+        # Get kedro_default (if it's defined)
+        default = getattr(cfg_i, "kedro_default")
+        if default is None:
+            continue
+        elif callable(default):
+            # Special check for types
+            if isinstance(default, type) and not issubclass(default, AbstractDataSet):
+                raise TypeError(
+                    "The `kedro_default` must be an AbstractDataSet or callable that creates one,"
+                    f" but got {default!r}"
+                )
+            # TODO: Check callable signature?
+            return default
+        else:
+            raise TypeError(
+                "The `kedro_default` must be an AbstractDataSet or callable that creates one,"
+                f" but got {default!r}"
+            )
+
+    return PickleDataSet
