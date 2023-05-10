@@ -12,6 +12,8 @@ from .json import PydanticJsonDataSet
 from .yaml import PydanticYamlDataSet
 from .zip import PydanticZipDataSet
 
+__all__ = ["PydanticAutoDataSet"]
+
 
 class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
     """Dataset for self-describing Pydantic models.
