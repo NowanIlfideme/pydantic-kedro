@@ -13,7 +13,7 @@ from pydantic_kedro import (
     PydanticZipDataSet,
 )
 
-Kls = Union[PydanticFolderDataSet, PydanticZipDataSet]
+Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
 
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 

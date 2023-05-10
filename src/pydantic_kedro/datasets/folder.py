@@ -25,9 +25,16 @@ __all__ = ["PydanticFolderDataSet"]
 DATA_PLACEHOLDER = "__DATA_PLACEHOLDER__"
 
 JsonPath = str  # not a "real" JSON Path, but just `.`-separated
-_Bis = Union[bool, int, str, Path, None]
 
 logger = logging.getLogger(__name__)
+
+# Some ridiculous types to support nested configurations
+_Bis = Union[bool, int, str, Path, None]
+_Dis1 = Dict[str, _Bis]
+_Dis2 = Dict[str, Union[_Bis, _Dis1]]
+_Dis3 = Dict[str, Union[_Bis, _Dis1, _Dis2]]
+_Dis4 = Dict[str, Union[_Bis, _Dis1, _Dis2, _Dis3]]
+# basically, Dict[str, Union[_Bis, Dict[str, Union[_Bis, Dict[str, _Bis]]]]], but better :)
 
 
 class KedroDataSetSpec(BaseModel):
@@ -39,7 +46,7 @@ class KedroDataSetSpec(BaseModel):
 
     type_: str = Field(alias="type")
     relative_path: str
-    args: Dict[str, Union[_Bis, Dict[str, Dict[str, _Bis]]]] = {}
+    args: _Dis4 = {}
 
     class Config(BaseConfig):
         """Internal Pydantic model configuration."""

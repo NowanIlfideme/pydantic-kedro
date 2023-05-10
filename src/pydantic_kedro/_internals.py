@@ -13,7 +13,7 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
         raise TypeError(f"Must pass a BaseModel subclass; got {kls!r}")
     kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = {}
     # Go through bases of `kls` in order
-    base_classes = kls.mro()
+    base_classes = reversed(kls.mro())
     for base_i in base_classes:
         # Get config class (if it's defined)
         cfg_i = getattr(base_i, "__config__", None)
@@ -52,7 +52,7 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
 def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
     """Get default Kedro dataset creator."""
     # Go backwards through bases of `kls` until you find a default value
-    rev_bases = reversed(kls.mro())
+    rev_bases = kls.mro()
     for base_i in rev_bases:
         # Get config class (if defined)
         cfg_i = getattr(base_i, "__config__", None)
