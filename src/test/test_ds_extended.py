@@ -4,9 +4,14 @@ from typing import Any, Dict, Union
 import pytest
 from kedro.extras.datasets.text import TextDataSet
 
-from pydantic_kedro import ArbModel, PydanticFolderDataSet, PydanticZipDataSet
+from pydantic_kedro import (
+    ArbModel,
+    PydanticAutoDataSet,
+    PydanticFolderDataSet,
+    PydanticZipDataSet,
+)
 
-Kls = Union[PydanticFolderDataSet, PydanticZipDataSet]
+Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
 
 
 class Singleton:
@@ -62,7 +67,7 @@ class UserExtendedModel(ArbModel):
 @pytest.mark.parametrize(
     "mdl", [UserExtendedModel(), UserExtendedModel(dct={"a": Singleton(), "b": MyStr("bee")})]
 )
-@pytest.mark.parametrize("kls", [PydanticFolderDataSet, PydanticZipDataSet])
+@pytest.mark.parametrize("kls", [PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet])
 def test_pandas_flat_model(mdl: UserExtendedModel, kls: Kls, tmpdir):
     """Test roundtripping of the flat Pandas model, using default Pickle dataset."""
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
