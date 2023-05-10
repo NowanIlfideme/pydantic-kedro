@@ -2,6 +2,7 @@
 
 from typing import Literal, Type, TypeVar
 
+from kedro.io.core import AbstractDataSet
 from pydantic import BaseModel
 
 from pydantic_kedro.datasets.auto import PydanticAutoDataSet
@@ -15,7 +16,7 @@ __all__ = ["load_model", "save_model"]
 T = TypeVar("T", bound=BaseModel)
 
 
-def load_model(uri: str, supercls: Type[T] = BaseModel) -> T:
+def load_model(uri: str, supercls: Type[T] = BaseModel) -> T:  # type: ignore
     """Load a Pydantic model from a given URI.
 
     Parameters
@@ -52,6 +53,7 @@ def save_model(
     """
     if not isinstance(model, BaseModel):
         raise TypeError(f"Expected Pydantic model, but got {model!r}")
+    ds: AbstractDataSet
     if format == "auto":
         ds = PydanticAutoDataSet(uri)
     elif format == "zip":
