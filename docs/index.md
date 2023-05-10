@@ -57,6 +57,12 @@ If you are using Kedro for the pipelines or data catalog, that should be enough.
 
 If you want to use these datasets stand-alone, keep on reading.
 
+## Standalone Usage
+
+The functions [save_model][pydantic_kedro.save_model] and
+[load_model][pydantic_kedro.load_model] can be used directly.
+See [the relevant docs](standalone_usage.md) for more info.
+
 ## "Pure" Pydantic Models
 
 If you have a JSON-safe Pydantic model, you can use a
