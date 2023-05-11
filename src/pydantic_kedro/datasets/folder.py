@@ -13,20 +13,28 @@ import fsspec
 from fsspec import AbstractFileSystem
 from fsspec.core import strip_protocol
 from fsspec.implementations.local import LocalFileSystem
-from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io.core import AbstractDataSet, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
 from pydantic.utils import import_string
 
-# __all__ = ["PydanticFolderDataSet"]
+from pydantic_kedro._internals import get_kedro_default, get_kedro_map
+
+__all__ = ["PydanticFolderDataSet"]
 
 
 DATA_PLACEHOLDER = "__DATA_PLACEHOLDER__"
 
 JsonPath = str  # not a "real" JSON Path, but just `.`-separated
-_Bis = Union[bool, int, str, Path, None]
 
 logger = logging.getLogger(__name__)
+
+# Some ridiculous types to support nested configurations
+_Bis = Union[bool, int, str, Path, None]
+_Dis1 = Dict[str, _Bis]
+_Dis2 = Dict[str, Union[_Bis, _Dis1]]
+_Dis3 = Dict[str, Union[_Bis, _Dis1, _Dis2]]
+_Dis4 = Dict[str, Union[_Bis, _Dis1, _Dis2, _Dis3]]
+# basically, Dict[str, Union[_Bis, Dict[str, Union[_Bis, Dict[str, _Bis]]]]], but better :)
 
 
 class KedroDataSetSpec(BaseModel):
@@ -38,7 +46,7 @@ class KedroDataSetSpec(BaseModel):
 
     type_: str = Field(alias="type")
     relative_path: str
-    args: Dict[str, Union[_Bis, Dict[str, Dict[str, _Bis]]]] = {}
+    args: _Dis4 = {}
 
     class Config(BaseConfig):
         """Internal Pydantic model configuration."""
@@ -252,12 +260,8 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
         # These are used to make datasets for various types
         # See the `kls.Config` class - this is inherited
-        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = getattr(
-            kls.__config__, "kedro_map", {}
-        )
-        kedro_default: Callable[[str], AbstractDataSet] = getattr(
-            kls.__config__, "kedro_default", PickleDataSet
-        )
+        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = get_kedro_map(kls)
+        kedro_default: Callable[[str], AbstractDataSet] = get_kedro_default(kls)
 
         def make_ds_for(obj: Any, path: str) -> AbstractDataSet:
             for k, v in kedro_map.items():
