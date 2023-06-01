@@ -33,7 +33,7 @@ repos:
   - repo: https://github.com/pre-commit/mirrors-mypy
     # NOTE: This passes ALL files to `mypy`. mypy will cache these.
     # However, we must ignore all missing imports, because pre-commit runs in a separate env
-    rev: "v1.2.0"
+    rev: "v1.3.0"
     hooks:
       - id: mypy
         pass_filenames: false
