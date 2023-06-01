@@ -1,7 +1,7 @@
 """Tests for values which are subclasses of the Pydantic field types."""
 
 from abc import abstractmethod
-from typing import Literal
+from typing import Dict, List, Literal
 
 import pytest
 from pydantic import BaseModel
@@ -45,6 +45,13 @@ class Bazzifier(BaseModel):
     maker: AbstractBaz
 
 
+class MultiBazzifier(BaseModel):
+    """Higher-level model with nested 'bazzifier' value."""
+
+    maker_list: List[AbstractBaz]
+    maker_dict: Dict[str, AbstractBaz]
+
+
 @pytest.mark.parametrize("format", ["auto", "zip", "folder", "yaml", "json"])
 @pytest.mark.parametrize("obj", [AlwaysBaz(foo="always"), CopyBaz(foo="copy")])
 def test_nested_subclass(
@@ -62,3 +69,15 @@ def test_nested_subclass(
     nest2 = load_model(f"{tmpdir}/nest", Bazzifier)
     assert nest.maker == nest2.maker
     assert nest.maker.get_baz() == nest2.maker.get_baz()
+
+
+@pytest.mark.parametrize("format", ["auto", "zip", "folder", "yaml", "json"])
+def test_deeper_nested_subclass(format: Literal["auto", "zip", "folder", "yaml", "json"], tmpdir: str):
+    """Test round-trip of objects with a nested subclass."""
+    a = AlwaysBaz(foo="always")
+    c = CopyBaz(foo="copy")
+    nest = MultiBazzifier(maker_list=[a, c], maker_dict={"a": a, "c": c})
+    # Nested round-trip (should also always work, but is much more diffictult)
+    save_model(nest, f"{tmpdir}/nest", format=format)
+    nest2 = load_model(f"{tmpdir}/nest", Bazzifier)
+    assert nest == nest2
