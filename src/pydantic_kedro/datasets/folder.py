@@ -15,9 +15,9 @@ from fsspec.core import strip_protocol
 from fsspec.implementations.local import LocalFileSystem
 from kedro.io.core import AbstractDataSet, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
-from pydantic.utils import import_string
 
-from pydantic_kedro._internals import get_kedro_default, get_kedro_map
+from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
+from pydantic_kedro._internals import get_kedro_default, get_kedro_map, import_string
 
 __all__ = ["PydanticFolderDataSet"]
 
@@ -117,7 +117,7 @@ class FolderFormatMetadata(BaseModel):
     """
 
     model_class: str
-    model_info: Union[Dict[str, Any], List[Any]]
+    model_info: Dict[str, Any]
     catalog: Dict[JsonPath, KedroDataSetSpec] = {}
     # pydantic_types: Dict[JsonPath, ImportStr] = {}
 
@@ -252,7 +252,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
             obj_i = ds_i.load()
             mutate_jsp(model_data, jsp, obj_i)
 
-        res = model_cls.parse_obj(model_data)
+        res = dict_to_model(model_data)
         return res
 
     def _save_local(self, data: BaseModel, filepath: str) -> None:
@@ -291,7 +291,8 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 return val
 
         # Roundtrip to apply the encoder and get UUID
-        rt = json.loads(data.json(encoder=fake_encoder))
+        with PatchPydanticIter():
+            rt = json.loads(data.json(encoder=fake_encoder))
 
         # This will map the data to a dataset and actually save it
 
@@ -319,6 +320,8 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
             return obj
 
         model_info = visit3(rt, "", base_path=filepath)
+        if not isinstance(model_info, dict):
+            raise NotImplementedError("Only dict root is supported for now.")
 
         # Create and write metadata
         meta = FolderFormatMetadata(model_class=model_class_str, model_info=model_info, catalog=catalog)

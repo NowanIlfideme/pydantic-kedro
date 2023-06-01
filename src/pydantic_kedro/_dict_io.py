@@ -2,10 +2,11 @@
 
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import BaseModel
-from pydantic.utils import import_string
+
+from ._internals import import_string
 
 KLS_MARK_STR = "class"
 
@@ -126,8 +127,11 @@ def _dict_manip(value: Dict[str, Any]) -> Dict[str, Any]:
     return new_value
 
 
-def dict_to_model(dct: Dict[str, Any]) -> BaseModel:
-    """Convert dictionary to model."""
+def dict_to_model(dct: Union[Dict[str, Any], List[Any]]) -> BaseModel:
+    """Convert dictionary (or, optionally, list) to model."""
+    if isinstance(dct, list):
+        dct = {"__root__": dct}
+
     # Checks... # redundant? see _classlike()
     if not isinstance(dct, dict):
         raise TypeError("Only dicts are supported right now.")
