@@ -1,10 +1,49 @@
 """Functions for internal use."""
 
-from typing import Callable, Dict, Type
+from typing import Any, Callable, Dict, Type
 
 from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io.core import AbstractDataSet
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
+
+KLS_MARK_STR = "class"
+
+
+def import_string(dotted_path: str) -> Any:
+    """Import the object from the string. Supports nested classes.
+
+    Import a dotted module path and return the attribute/class designated by the
+    last name in the path. Raise ImportError if the import fails.
+
+    Stolen from Pydantic, who stole it approximately from django, and then improved.
+    """
+    from importlib import import_module
+    from types import ModuleType
+
+    parts = dotted_path.strip(" ").split(".")
+    module: ModuleType = None  # type: ignore
+
+    if len(parts) == 1:
+        raise ImportError(f"{dotted_path!r} doesn't look like a module path")
+
+    for rhs in range(1, len(parts)):
+        class_parts = parts[-rhs:]
+        module_path = ".".join(parts[:-rhs])
+        try:
+            module = import_module(module_path)
+        except ImportError:
+            # we need to move
+            continue
+        try:
+            obj: Any = module
+            for clp in class_parts:
+                obj = getattr(obj, clp)
+        except AttributeError as e:
+            raise ImportError(f"Could not import {dotted_path!r}, though module exists.") from e
+        break
+    else:
+        raise ImportError(f"Could not import {dotted_path!r}, likely no such module exists.")
+    return obj
 
 
 def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDataSet]]:
@@ -78,3 +117,22 @@ def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
             )
 
     return PickleDataSet
+
+
+def create_expanded_model(model: BaseModel) -> BaseModel:
+    """Create an 'expanded' model with additional metadata."""
+    pyd_kls = type(model)
+    if KLS_MARK_STR in pyd_kls.__fields__.keys():
+        raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
+    pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
+
+    field_defs = {KLS_MARK_STR: (str, pyd_kls_path)}
+
+    tmp_kls = create_model(  # type: ignore
+        pyd_kls.__name__,
+        __base__=pyd_kls,
+        __module__=pyd_kls.__module__,
+        **field_defs,
+    )
+    tmp_obj = tmp_kls(**dict(model._iter(to_dict=False)))
+    return tmp_obj
