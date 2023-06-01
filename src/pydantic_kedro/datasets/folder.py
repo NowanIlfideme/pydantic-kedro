@@ -94,7 +94,7 @@ class KedroDataSetSpec(BaseModel):
         for k, v in params_raw.items():
             if k in sig.parameters:
                 params[k] = v
-        return kls(**params)
+        return kls(**params)  # type: ignore
 
 
 KedroDataSetSpec.update_forward_refs()
