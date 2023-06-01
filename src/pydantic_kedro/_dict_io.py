@@ -91,7 +91,7 @@ class PatchPydanticIter(AbstractContextManager):
         __exc_value: Optional[BaseException] = None,
         __traceback: Optional[TracebackType] = None,
     ) -> Optional[bool]:
-        BaseModel._iter = self.orig_iter
+        BaseModel._iter = self.orig_iter  # type: ignore
         return super().__exit__(__exc_type, __exc_value, __traceback)
 
 

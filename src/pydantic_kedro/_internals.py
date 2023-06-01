@@ -128,7 +128,7 @@ def create_expanded_model(model: BaseModel) -> BaseModel:
 
     field_defs = {KLS_MARK_STR: (str, pyd_kls_path)}
 
-    tmp_kls = create_model(
+    tmp_kls = create_model(  # type: ignore
         pyd_kls.__name__,
         __base__=pyd_kls,
         __module__=pyd_kls.__module__,
