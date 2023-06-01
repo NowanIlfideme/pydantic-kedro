@@ -7,10 +7,10 @@ from typing import Any, Dict, no_type_check
 import fsspec
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
-from pydantic import BaseModel, create_model, parse_obj_as
+from pydantic import BaseModel, parse_obj_as
 from pydantic.utils import import_string
 
-KLS_MARK_STR = "class"
+from pydantic_kedro._internals import KLS_MARK_STR, create_expanded_model
 
 
 class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
@@ -75,17 +75,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     def _save(self, data: BaseModel) -> None:
         """Save Pydantic model to the filepath."""
         # Add metadata to our Pydantic model
-        pyd_kls = type(data)
-        if KLS_MARK_STR in pyd_kls.__fields__.keys():
-            raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
-        pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
-        tmp_kls = create_model(
-            pyd_kls.__name__,
-            __base__=pyd_kls,
-            __module__=pyd_kls.__module__,
-            **{KLS_MARK_STR: (str, pyd_kls_path)},
-        )
-        tmp_obj = tmp_kls(**dict(data._iter(to_dict=False)))
+        tmp_obj = create_expanded_model(data)
 
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)

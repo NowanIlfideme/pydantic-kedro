@@ -4,7 +4,9 @@ from typing import Callable, Dict, Type
 
 from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io.core import AbstractDataSet
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
+
+KLS_MARK_STR = "class"
 
 
 def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDataSet]]:
@@ -78,3 +80,19 @@ def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
             )
 
     return PickleDataSet
+
+
+def create_expanded_model(model: BaseModel) -> BaseModel:
+    """Create an 'expanded' model with additional metadata."""
+    pyd_kls = type(model)
+    if KLS_MARK_STR in pyd_kls.__fields__.keys():
+        raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
+    pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
+    tmp_kls = create_model(
+        pyd_kls.__name__,
+        __base__=pyd_kls,
+        __module__=pyd_kls.__module__,
+        **{KLS_MARK_STR: (str, pyd_kls_path)},
+    )
+    tmp_obj = tmp_kls(**dict(model._iter(to_dict=False)))
+    return tmp_obj
