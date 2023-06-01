@@ -25,6 +25,7 @@ __all__ = ["PydanticFolderDataSet"]
 DATA_PLACEHOLDER = "__DATA_PLACEHOLDER__"
 
 JsonPath = str  # not a "real" JSON Path, but just `.`-separated
+ImportStr = str
 
 logger = logging.getLogger(__name__)
 
@@ -111,14 +112,17 @@ class FolderFormatMetadata(BaseModel):
         Model parameters, encoded with a data path.
     catalog : dict
         Mapping of "json path" to a dataset spec.
+    pydantic_types : dict
+        Mapping of "json path" to the Pydantic model type, for nested models.
     """
 
     model_class: str
     model_info: Union[Dict[str, Any], List[Any]]
     catalog: Dict[JsonPath, KedroDataSetSpec] = {}
+    # pydantic_types: Dict[JsonPath, ImportStr] = {}
 
 
-def mutate_jsp(struct: Union[Dict[str, Any], List[Any]], jsp: List[str], obj: Any) -> None:
+def mutate_jsp(struct: Union[Dict[str, Any], List[Any]], jsp: List[JsonPath], obj: Any) -> None:
     """Mutates `struct` in-place given the jsp (which is json-path-like)."""
     if isinstance(struct, dict):
         key = jsp[0]
