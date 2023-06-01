@@ -85,7 +85,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
             __module__=pyd_kls.__module__,
             **{KLS_MARK_STR: (str, pyd_kls_path)},
         )
-        tmp_obj = tmp_kls(**data.dict())
+        tmp_obj = tmp_kls(**dict(data._iter(to_dict=False)))
 
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)
