@@ -88,11 +88,14 @@ def create_expanded_model(model: BaseModel) -> BaseModel:
     if KLS_MARK_STR in pyd_kls.__fields__.keys():
         raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
     pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
+
+    field_defs = {KLS_MARK_STR: (str, pyd_kls_path)}
+
     tmp_kls = create_model(
         pyd_kls.__name__,
         __base__=pyd_kls,
         __module__=pyd_kls.__module__,
-        **{KLS_MARK_STR: (str, pyd_kls_path)},
+        **field_defs,
     )
     tmp_obj = tmp_kls(**dict(model._iter(to_dict=False)))
     return tmp_obj
