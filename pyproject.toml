@@ -106,5 +106,12 @@ module = ["pydantic_kedro.*"]
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = ["setuptools", "setuptools_scm", "fsspec.*", "cloudpickle", "fusepy"]
+module = [
+    "setuptools",
+    "setuptools_scm",
+    "fsspec.*",
+    "cloudpickle",
+    "fusepy",
+    "ruamel.yaml",
+]
 ignore_missing_imports = true

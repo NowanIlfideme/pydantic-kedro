@@ -4,7 +4,7 @@ from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, Dict, List, Optional, Type
 
-from pydantic import BaseModel, parse_obj_as
+from pydantic import BaseModel
 from pydantic.utils import import_string
 
 KLS_MARK_STR = "class"
@@ -104,11 +104,25 @@ def _classlike(obj: Any) -> bool:
 def _list_manip(value: List[Any]) -> List[Any]:
     new_value = list(value)
     for i, v_i in enumerate(value):
-        if isinstance(v_i, list):
-            new_value[i] = _list_manip(v_i)
-        elif _classlike(v_i):
+        if _classlike(v_i):
             new_value[i] = dict_to_model(v_i)
+        elif isinstance(v_i, dict):
+            new_value[i] = _dict_manip(v_i)
+        elif isinstance(v_i, list):
+            new_value[i] = _list_manip(v_i)
         # otherwise ignore
+    return new_value
+
+
+def _dict_manip(value: Dict[str, Any]) -> Dict[str, Any]:
+    new_value = dict(value)
+    for k, v_k in value.items():
+        if _classlike(v_k):
+            new_value[k] = dict_to_model(v_k)
+        elif isinstance(v_k, dict):
+            new_value[k] = _dict_manip(v_k)
+        elif isinstance(v_k, list):
+            new_value[k] = _list_manip(v_k)
     return new_value
 
 
@@ -128,9 +142,10 @@ def dict_to_model(dct: Dict[str, Any]) -> BaseModel:
             raw[key] = dict_to_model(value)
         elif isinstance(value, list):
             raw[key] = _list_manip(value)
+        elif isinstance(value, dict):
+            raw[key] = _dict_manip(value)
         # otherwise ignore
-    # return pyd_kls(**raw)
-    return parse_obj_as(pyd_kls, raw)
+    return pyd_kls(**raw)  # Consider parse_obj_as(pyd_kls, raw) ?
 
 
 def model_to_dict(model: BaseModel) -> Dict[str, Any]:

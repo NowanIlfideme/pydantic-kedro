@@ -4,19 +4,13 @@ from pathlib import PurePosixPath
 from typing import Any, Dict, no_type_check
 
 import fsspec
+import ruamel.yaml as yaml
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
-from pydantic import BaseModel, Field
-from pydantic.utils import import_string
-from pydantic_yaml import parse_yaml_file_as, to_yaml_file
+from pydantic import BaseModel
+from pydantic_yaml import to_yaml_file
 
-from pydantic_kedro._internals import KLS_MARK_STR, create_expanded_model
-
-
-class _YamlPreLoader(BaseModel):
-    """YAML pre-loader model."""
-
-    kls_mark_str: str = Field(alias=KLS_MARK_STR)  # type: ignore
+from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 
 
 class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
@@ -68,23 +62,20 @@ class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # are appended correctly for different filesystems
         load_path = get_filepath_str(self._filepath, self._protocol)
         with self._fs.open(load_path, mode="r") as f:
-            preloader = parse_yaml_file_as(_YamlPreLoader, f)
-        pyd_kls = import_string(preloader.kls_mark_str)
-        assert issubclass(pyd_kls, BaseModel), f"Type must be a Pydantic model, got {type(pyd_kls)!r}."
-        with self._fs.open(load_path, mode="r") as f:
-            res = parse_yaml_file_as(pyd_kls, f)
+            dct = yaml.safe_load(f)
+
+        assert isinstance(dct, dict), "YAML root must be a mapping."
+        res = dict_to_model(dct)
         return res  # type: ignore
 
     @no_type_check
     def _save(self, data: BaseModel) -> None:
         """Save Pydantic model to the filepath."""
-        # Add metadata to our Pydantic model
-        tmp_obj = create_expanded_model(data)
-
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)
-        with self._fs.open(save_path, mode="w") as f:
-            to_yaml_file(f, tmp_obj)
+        with PatchPydanticIter():
+            with self._fs.open(save_path, mode="w") as f:
+                to_yaml_file(f, data)
 
     def _describe(self) -> Dict[str, Any]:
         """Return a dict that describes the attributes of the dataset."""

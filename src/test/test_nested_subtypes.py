@@ -79,5 +79,5 @@ def test_deeper_nested_subclass(format: Literal["auto", "zip", "folder", "yaml",
     nest = MultiBazzifier(maker_list=[a, c], maker_dict={"a": a, "c": c})
     # Nested round-trip (should also always work, but is much more diffictult)
     save_model(nest, f"{tmpdir}/nest", format=format)
-    nest2 = load_model(f"{tmpdir}/nest", Bazzifier)
+    nest2 = load_model(f"{tmpdir}/nest", MultiBazzifier)
     assert nest == nest2
