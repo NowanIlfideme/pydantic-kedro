@@ -59,6 +59,6 @@ def test_nested_subclass(
     # Nested round-trip (should also always work, but is more diffictult)
     nest = Bazzifier(maker=obj)
     save_model(nest, f"{tmpdir}/nest", format=format)
-    # nest2 = load_model(f"{tmpdir}/nest", Bazzifier)
-    # assert nest.maker == nest2.maker
-    # assert nest.maker.get_baz() == nest2.maker.get_baz()
+    nest2 = load_model(f"{tmpdir}/nest", Bazzifier)
+    assert nest.maker == nest2.maker
+    assert nest.maker.get_baz() == nest2.maker.get_baz()
