@@ -149,7 +149,9 @@ def dict_to_model(dct: Union[Dict[str, Any], List[Any]]) -> BaseModel:
         elif isinstance(value, dict):
             raw[key] = _dict_manip(value)
         # otherwise ignore
-    return pyd_kls(**raw)  # Consider parse_obj_as(pyd_kls, raw) ?
+    keywords = dict(raw)
+    del keywords[KLS_MARK_STR]
+    return pyd_kls(**keywords)  # Consider parse_obj_as(pyd_kls, keywords) ?
 
 
 def model_to_dict(model: BaseModel) -> Dict[str, Any]:
