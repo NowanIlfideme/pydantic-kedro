@@ -2,11 +2,14 @@
 
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
+from uuid import uuid4
 
 import fsspec
 from fsspec.implementations.zip import ZipFileSystem
 from kedro.io.core import AbstractDataSet
 from pydantic import BaseModel
+
+from pydantic_kedro._local_caching import get_cache_dir
 
 from .folder import PydanticFolderDataSet
 
@@ -50,18 +53,20 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
         Pydantic model.
         """
         filepath = self._filepath
-        with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
-            m_local = fsspec.get_mapper(tmpdir)
-            # Unzip via copying to folder
-            with fsspec.open(filepath) as zip_file:
-                zip_fs = ZipFileSystem(fo=zip_file)  # type: ignore
-                m_zip = zip_fs.get_mapper()
-                for k, v in m_zip.items():
-                    m_local[k] = v
-                zip_fs.close()
-            # Load folder dataset
-            pfds = PydanticFolderDataSet(tmpdir)
-            res = pfds.load()
+        # Making a temp directory in the current cache dir location
+        tmpdir = get_cache_dir() / str(uuid4()).replace("-", "")
+        tmpdir.mkdir(exist_ok=False, parents=True)
+        m_local = fsspec.get_mapper(str(tmpdir))
+        # Unzip via copying to folder
+        with fsspec.open(filepath) as zip_file:
+            zip_fs = ZipFileSystem(fo=zip_file)  # type: ignore
+            m_zip = zip_fs.get_mapper()
+            for k, v in m_zip.items():
+                m_local[k] = v
+            zip_fs.close()
+        # Load folder dataset
+        pfds = PydanticFolderDataSet(str(tmpdir))
+        res = pfds.load()
         return res
 
     def _save(self, data: BaseModel) -> None:
