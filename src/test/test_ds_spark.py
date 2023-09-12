@@ -17,14 +17,14 @@ Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
 
 
 class _SparkModel(ArbModel):
-    """Pandas model, configured to use Parquet."""
+    """Spark model, configured to use SparkDataSet (mult-file parquet)."""
 
     class Config(ArbModel.Config):
         kedro_map = {DataFrame: SparkDataSet}
 
 
 class FlatSparkModel(_SparkModel):
-    """Flat model that tests Pandas using Picke dataset (default)."""
+    """Flat model that tests Spark using Picke dataset (default)."""
 
     df: DataFrame
     val: int
@@ -44,7 +44,7 @@ def spark() -> SparkSession:
     ],
 )
 def test_spark_flat_model(kls: Kls, df_raw: list[dict[str, Any]], spark: SparkSession, tmpdir):
-    """Test roundtripping of the flat Pandas model, using default Pickle dataset."""
+    """Test roundtripping of the flat Spark model, using Kedro's SparkDataSet."""
     dfx = spark.createDataFrame(df_raw)
     mdl = FlatSparkModel(df=dfx, val=1)
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
