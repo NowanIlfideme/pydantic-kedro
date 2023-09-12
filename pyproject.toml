@@ -22,7 +22,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=1.10.0,<2",
-    "pydantic-yaml>=1.0.0a2",
+    "pydantic-yaml>=1.1.2",
     "kedro",
     "fsspec",
 ]
@@ -39,7 +39,9 @@ dev = [
     "mypy==1.4.1",
     "pytest==7.4.0",
     # required for testing
-    "kedro[pandas]",
+    "pandas~=1.5.3",
+    "pyspark~=3.4.1",
+    "kedro[pandas,spark]",
 ]
 docs = [
     "mkdocs",
