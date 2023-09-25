@@ -321,6 +321,9 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 return {k: visit3(v, f"{jsp}.{k}", base_path) for k, v in obj.items()}
             return obj
 
+        # Ensure directory exists
+        Path(filepath).mkdir(parents=True, exist_ok=True)
+
         model_info = visit3(rt, "", base_path=filepath)
         if not isinstance(model_info, dict):
             raise NotImplementedError("Only dict root is supported for now.")

@@ -1,6 +1,7 @@
 """JSON dataset definition for Pydantic."""
 
 import json
+import warnings
 from pathlib import PurePosixPath
 from typing import Any, Dict, no_type_check
 
@@ -70,6 +71,15 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         """Save Pydantic model to the filepath."""
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)
+
+        # Ensure parent directory exists
+        try:
+            if "/" in save_path:
+                parent_path, *_ = save_path.rsplit("/", maxsplit=1)
+                self._fs.makedirs(parent_path, exist_ok=True)
+        except Exception:
+            warnings.warn(f"Failed to create parent path for {save_path}")
+
         with PatchPydanticIter():
             with self._fs.open(save_path, mode="w") as f:
                 f.write(data.json())

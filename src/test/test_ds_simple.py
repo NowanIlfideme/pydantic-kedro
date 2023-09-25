@@ -40,7 +40,12 @@ types = [
 @pytest.mark.parametrize("kls", types)
 def test_simple_model_rt(mdl: SimpleTestModel, kls: AbstractDataSet, tmpdir):  # type: ignore
     """Tests whether a simple model survives roundtripping."""
-    paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
+    paths = [
+        f"{tmpdir}/model_on_disk",
+        f"{tmpdir}/new_folder/model_on_disk",
+        f"memory://{tmpdir}/model_in_memory",
+        f"memory://{tmpdir}/new_folder/model_in_memory",
+    ]
     for path in paths:
         ds: AbstractDataSet = kls(path)  # type: ignore
         ds.save(mdl)

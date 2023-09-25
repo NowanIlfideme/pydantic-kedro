@@ -1,5 +1,6 @@
 """Zip-file dataset for Pydantic models with arbitrary types."""
 
+import warnings
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
 from uuid import uuid4
@@ -72,6 +73,15 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
     def _save(self, data: BaseModel) -> None:
         """Save Pydantic model to the filepath."""
         filepath = self._filepath
+        # Ensure parent directory exists
+        try:
+            if "/" in filepath:
+                parent_path, *_ = filepath.rsplit("/", maxsplit=1)
+                xfs = fsspec.open(filepath).fs
+                xfs.makedirs(parent_path, exist_ok=True)
+        except Exception:
+            warnings.warn(f"Failed to create parent path for {filepath}")
+
         with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
             # Save folder dataset
             pfds = PydanticFolderDataSet(tmpdir)
