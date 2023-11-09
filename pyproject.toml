@@ -39,7 +39,7 @@ dev = [
     "mypy==1.4.1",
     "pytest==7.4.2",
     # required for testing
-    "pandas~=1.5.3",
+    "pandas>=1.5.3,<2.2.0",
     "pyspark~=3.4.1",
     "kedro[pandas,spark]",
 ]
