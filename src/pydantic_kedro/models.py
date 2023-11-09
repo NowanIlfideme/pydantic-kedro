@@ -22,10 +22,12 @@ class ArbModel(BaseModel):
     This also supports type hints for `pydantic_kedro` in the configuration:
 
     - `kedro_map`, which maps a type to a dataset constructor to use.
-    - `kedro_default`, which specifies the default dataset type to use.
+    - `kedro_default`, which specifies the default dataset type to use
+      ([kedro.extras.datasets.pickle.PickleDataSet][])
 
-    These are NOT currently inherited (TODO).
-    The default dataset type that's used is [kedro.extras.datasets.pickle.PickleDataSet][]
+    These are pseudo-inherited, see [config-inheritence][].
+    You do not actually need to inherit from `ArbModel` for this to work, however it can help with
+    type completion in your IDE.
     """
 
     Config = ArbConfig

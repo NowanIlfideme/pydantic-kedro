@@ -126,15 +126,39 @@ Internally, this uses the `ParquetDataSet` to save the dataframe as an
 as well as reference it from within the JSON file. That means that, unlike
 Pickle, the file isn't "fragile" and will be readable with future versions.
 
-## Known Issues
+## Config Inheritence
 
-1. Currently, the `Config` is not magically inherited by subclasses.
-   That means that you should explicitly inherit `YourType.Config` from `YourType`'s
-   base class if you want to override it. It also means that the `kedro_map`
-   isn't merged for subclasses; you'll need to do this explicitly for now.
-2. Only the top-level model's `Config` is taken into account when serializing
+[Similarly to Pydantic](https://docs.pydantic.dev/latest/usage/model_config/#change-behaviour-globally),
+the `Config` class has a sort of pseudo-inheritence.
+That is, if you define your classes like this:
+
+```python
+class A(BaseModel):
+    class Config:
+        allow_arbitrary_types = True
+        kedro_map = {Foo: FooDataSet}
+
+
+class B(A):
+    class Config:
+        kedro_map = {Bar: BarDataSet}
+
+class C(B):
+    class Config:
+        kedro_map = {Foo: foo_ds_maker}
+        kedro_default = DefaultDataSet
+
+```
+
+Then class `B` will act as if `kedro_map = {Foo: FooDataSet, Bar: BarDataSet}`,
+and class `C` will act as if `kedro_map = {Foo: foo_ds_maker, Bar: BarDataSet}`
+and `kedro_default = DefaultDataSet`
+
+## Considerations
+
+1. Only the top-level model's `Config` is taken into account when serializing
    to a Kedro dataset, ignoring any children's configs.
    This means that all values of a particular type are serialized the same way.
-3. `pydantic` V2 is not supported yet, but V2
+2. `pydantic` V2 is not supported yet, but V2
    [has a different configuration method](https://docs.pydantic.dev/blog/pydantic-v2-alpha/#changes-to-config).
    `pydantic-kedro` might change the configuration method entirely to be more compliant.

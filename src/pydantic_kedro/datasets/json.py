@@ -1,6 +1,7 @@
 """JSON dataset definition for Pydantic."""
 
 import json
+import warnings
 from pathlib import PurePosixPath
 from typing import Any, Dict, no_type_check
 
@@ -11,11 +12,11 @@ from pydantic import BaseModel, create_model, parse_obj_as
 
 from pydantic_kedro._compat import get_field_names, import_string
 
-KLS_MARK_STR = "class"
+from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 
 
 class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
-    """A Pydantic model with JSON-based load/save.
+    """Dataset for saving/loading Pydantic models, based on JSON.
 
     Please note that the Pydantic model must be JSON-serializable.
     That means the fields are "pure" Pydantic fields,
@@ -46,6 +47,11 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         self._filepath = PurePosixPath(path)
         self._fs: AbstractFileSystem = fsspec.filesystem(self._protocol)
 
+    @property
+    def filepath(self) -> str:
+        """File path name."""
+        return str(self._filepath)
+
     def _load(self) -> BaseModel:
         """Load Pydantic model from the filepath.
 
@@ -59,12 +65,7 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
         with self._fs.open(load_path, mode="r") as f:
             dct = json.load(f)
         assert isinstance(dct, dict), "JSON root must be a mapping."
-        if KLS_MARK_STR not in dct.keys():
-            raise TypeError(f"Cannot determine pydantic model type, missing {KLS_MARK_STR!r}")
-        pyd_kls = import_string(dct[KLS_MARK_STR])
-        assert issubclass(pyd_kls, BaseModel), f"Type must be a Pydantic model, got {type(pyd_kls)!r}."
-        dct.pop(KLS_MARK_STR)  # don't accidentally pass to proper model
-        res = parse_obj_as(pyd_kls, dct)
+        res = dict_to_model(dct)
         return res  # type: ignore
 
     @no_type_check
@@ -85,9 +86,19 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
         # Open file and write to it
         save_path = get_filepath_str(self._filepath, self._protocol)
-        with self._fs.open(save_path, mode="w") as f:
-            f.write(tmp_obj.json())
+
+        # Ensure parent directory exists
+        try:
+            if "/" in save_path:
+                parent_path, *_ = save_path.rsplit("/", maxsplit=1)
+                self._fs.makedirs(parent_path, exist_ok=True)
+        except Exception:
+            warnings.warn(f"Failed to create parent path for {save_path}")
+
+        with PatchPydanticIter():
+            with self._fs.open(save_path, mode="w") as f:
+                f.write(data.json())
 
     def _describe(self) -> Dict[str, Any]:
         """Return a dict that describes the attributes of the dataset."""
-        return dict(filepath=self._filepath, protocol=self._protocol)
+        return dict(filepath=self.filepath, protocol=self._protocol)
