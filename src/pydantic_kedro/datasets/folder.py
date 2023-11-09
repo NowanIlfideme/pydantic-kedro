@@ -18,6 +18,7 @@ from pydantic import BaseConfig, BaseModel, Extra, Field
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 from pydantic_kedro._internals import get_kedro_default, get_kedro_map, import_string
+from pydantic_kedro._local_caching import get_cache_dir
 
 __all__ = ["PydanticFolderDataSet"]
 
@@ -216,17 +217,18 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         if isinstance(fs, LocalFileSystem):
             return self._load_local(self._filepath)
         else:
-            from tempfile import TemporaryDirectory
+            # Making a temp directory in the current cache dir location
+            tmpdir = get_cache_dir() / str(uuid4()).replace("-", "")
+            tmpdir.mkdir(exist_ok=False, parents=True)
 
-            with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
-                # Copy from remote... yes, I know, not ideal!
-                m_remote = fsspec.get_mapper(self._filepath)
-                m_local = fsspec.get_mapper(tmpdir)
-                for k, v in m_remote.items():
-                    m_local[k] = v
+            # Copy from remote... yes, this is not ideal!
+            m_remote = fsspec.get_mapper(self._filepath)
+            m_local = fsspec.get_mapper(str(tmpdir))
+            for k, v in m_remote.items():
+                m_local[k] = v
 
-                # Load locally
-                return self._load_local(tmpdir)
+            # Load locally
+            return self._load_local(str(tmpdir))
 
     def _load_local(self, filepath: str) -> BaseModel:
         """Load Pydantic model from the local filepath.
@@ -318,6 +320,9 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
             elif isinstance(obj, dict):
                 return {k: visit3(v, f"{jsp}.{k}", base_path) for k, v in obj.items()}
             return obj
+
+        # Ensure directory exists
+        Path(filepath).mkdir(parents=True, exist_ok=True)
 
         model_info = visit3(rt, "", base_path=filepath)
         if not isinstance(model_info, dict):
