@@ -36,7 +36,7 @@ dev = [
     "black==23.11.0",
     "isort==5.12.0",
     "ruff==0.0.291",
-    "mypy==1.5.1",
+    "mypy==1.6.1",
     "pytest==7.4.2",
     # required for testing
     "pandas>=1.5.3,<2.2.0",
