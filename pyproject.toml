@@ -23,8 +23,8 @@ classifiers = [
 dependencies = [
     "pydantic>=1.10.0,<2",
     "pydantic-yaml>=1.1.2",
-    "ruamel-yaml<0.18",     # Currently needed
-    "kedro",
+    "ruamel-yaml<0.18",     # Current limitation
+    "kedro<0.19",           # Current limitation
     "fsspec",
 ]
 urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
