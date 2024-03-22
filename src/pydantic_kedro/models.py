@@ -2,9 +2,14 @@
 
 from typing import Callable, Dict, Type
 
-from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.io import AbstractDataSet
+from kedro_datasets.pickle.pickle_dataset import PickleDataset
+from kedro.io import AbstractDataset
 from pydantic import BaseConfig, BaseModel
+
+
+def _kedro_default(x: str) -> PickleDataset:
+    """Definition of default dataset."""
+    return PickleDataset(filepath=x)
 
 
 class ArbConfig(BaseConfig):
@@ -12,8 +17,8 @@ class ArbConfig(BaseConfig):
 
     arbitrary_types_allowed = True
 
-    kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = {}
-    kedro_default: Callable[[str], AbstractDataSet] = PickleDataSet
+    kedro_map: Dict[Type, Callable[[str], AbstractDataset]] = {}
+    kedro_default: Callable[[str], AbstractDataset] = _kedro_default
 
 
 class ArbModel(BaseModel):
@@ -23,7 +28,7 @@ class ArbModel(BaseModel):
 
     - `kedro_map`, which maps a type to a dataset constructor to use.
     - `kedro_default`, which specifies the default dataset type to use
-      ([kedro.extras.datasets.pickle.PickleDataSet][])
+      ([kedro_datasets.pickle.PickleDataSet][])
 
     These are pseudo-inherited, see [config-inheritence][].
     You do not actually need to inherit from `ArbModel` for this to work, however it can help with

@@ -5,13 +5,29 @@ from typing import Type, Union
 
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pandas import CSVDataSet, ParquetDataSet
-from kedro.extras.datasets.pickle import PickleDataSet
+from kedro_datasets.pandas.csv_dataset import CSVDataset
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
+from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from pydantic import BaseModel
 
 from pydantic_kedro import PydanticFolderDataSet
 
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
+
+
+def csv_ds(path: str) -> CSVDataset:
+    """Create a CSV dataset."""
+    return CSVDataset(filepath=path, save_args=dict(index=False), load_args=dict())
+
+
+def parquet_ds(path: str) -> ParquetDataset:
+    """Creata a Parquet dataset for Pandas."""
+    return ParquetDataset(filepath=path)
+
+
+def pickle_ds(path: str) -> PickleDataset:
+    """Creata a Pickle dataset."""
+    return PickleDataset(filepath=path)
 
 
 class BaseA(BaseModel):
@@ -21,18 +37,13 @@ class BaseA(BaseModel):
         """Config for pydantic-kedro."""
 
         arbitrary_types_allowed = True
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+        kedro_map = {pd.DataFrame: parquet_ds}
 
 
 class Model1A(BaseA):
     """Model with Parquet dataset base."""
 
     df: pd.DataFrame
-
-
-def csv_ds(path: str) -> CSVDataSet:
-    """Create a CSV dataset."""
-    return CSVDataSet(path, save_args=dict(index=False), load_args=dict())
 
 
 class BaseB(BaseA):
@@ -73,8 +84,9 @@ class BaseD(BaseC):
     class Config:
         """Config for pydantic-kedro."""
 
-        kedro_map = {Fake: PickleDataSet}
-        kedro_default = ParquetDataSet  # Bad idea in practice, but this is for the test
+        kedro_map = {Fake: pickle_ds}
+        # Bad idea in practice, but this is for the test
+        kedro_default = parquet_ds
 
 
 class Model1D(BaseD):
@@ -85,12 +97,12 @@ class Model1D(BaseD):
 
 @pytest.mark.parametrize(
     ["model_type", "ds_type"],
-    [[Model1A, ParquetDataSet], [Model1B, CSVDataSet], [Model1C, CSVDataSet], [Model1D, CSVDataSet]],
+    [[Model1A, ParquetDataset], [Model1B, CSVDataset], [Model1C, CSVDataset], [Model1D, CSVDataset]],
 )
 def test_pandas_flat_model(
     tmpdir,
     model_type: Type[Union[Model1A, Model1B, Model1C, Model1D]],
-    ds_type: Type[Union[ParquetDataSet, CSVDataSet]],
+    ds_type: Type[Union[ParquetDataset, CSVDataset]],
 ):
     """Test roundtripping of the different dataset models."""
     # Create and save model
@@ -98,5 +110,5 @@ def test_pandas_flat_model(
     path = Path(f"{tmpdir}/model_on_disk")
     PydanticFolderDataSet(str(path)).save(model)
     # Try loading with the supposed dataframe type
-    found_df = ds_type(str(path / ".df")).load()
+    found_df = ds_type(filepath=str(path / ".df")).load()
     assert isinstance(found_df, pd.DataFrame)

@@ -1,10 +1,12 @@
 """Test extended models, but without external libraries."""
+
 from typing import Any, Dict, Union
 
 import pytest
-from kedro.extras.datasets.text import TextDataSet
+from kedro_datasets.text.text_dataset import TextDataset
 
 from pydantic_kedro import (
+    ArbConfig,
     ArbModel,
     PydanticAutoDataSet,
     PydanticFolderDataSet,
@@ -41,7 +43,7 @@ class MyStr:
         return self.v
 
 
-class MyStrDs(TextDataSet):
+class MyStrDs(TextDataset):
     """Custom dataset for loading MyStr type."""
 
     def _load(self) -> MyStr:
@@ -54,10 +56,10 @@ class MyStrDs(TextDataSet):
 class UserExtendedModel(ArbModel):
     """Arbitrary model, extended with the user model."""
 
-    class Config(ArbModel.Config):
+    class Config(ArbConfig):
         """Arbitrary model configuration."""
 
-        kedro_map = {MyStr: MyStrDs}
+        kedro_map = {MyStr: lambda x: MyStrDs(filepath=x)}
 
     sing: Singleton = Singleton()
     ms: MyStr = MyStr("foobar")

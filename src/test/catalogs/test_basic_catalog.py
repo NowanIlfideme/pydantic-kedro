@@ -1,8 +1,9 @@
 """Minimal tests for the Kedro catalog."""
+
 import os
 from pathlib import Path
 
-from kedro.config import ConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
 from pydantic import BaseModel
 
@@ -18,8 +19,8 @@ class MyPureModel(BaseModel):
     y: str
 
 
-# # Create an in-memory (temporary) file via `fsspec` and save it
 obj = MyPureModel(x=1, y="why?")
+# To re-create the JSON file:
 # ds = PydanticJsonDataSet(local_dir / "data/tst1.json")
 # ds.save(obj)
 
@@ -27,8 +28,8 @@ obj = MyPureModel(x=1, y="why?")
 def test_basic_catalog():
     """Basic test to ensure."""
     os.chdir(local_dir)
-    conf_loader = ConfigLoader(str(local_dir / "conf"))
-    catalog = DataCatalog.from_config(conf_loader.get("catalog.yml"))
+    conf_loader = OmegaConfigLoader(str(local_dir / "conf"), env="local")
+    catalog = DataCatalog.from_config(conf_loader["catalog"])
     obj2 = catalog.load("tst1")
     assert isinstance(catalog.datasets.tst1, PydanticJsonDataSet)  # type: ignore
     assert obj2 == obj

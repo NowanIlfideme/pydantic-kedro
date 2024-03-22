@@ -30,18 +30,18 @@ Here's an example that uses a Pandas dataframe.
 from tempfile import TemporaryDirectory
 
 import pandas as pd
-from kedro.extras.datasets.pandas import ParquetDataSet
-from pydantic import validator
-from pydantic_kedro import ArbModel, load_model, save_model
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 
+from pydantic_kedro import ArbConfig, ArbModel, load_model, save_model
 
 # Arbitrary model class with a few useful defaults
+
 
 class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
-    class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+    class Config(ArbConfig):
+        kedro_map = {pd.DataFrame: lambda x: ParquetDataset(filepath=x)}
 
 
 class MyModel(_PdModel):

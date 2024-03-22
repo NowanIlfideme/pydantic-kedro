@@ -1,6 +1,7 @@
 """Kedro datasets for serializing Pydantic models."""
 
 __all__ = [
+    "ArbConfig",
     "ArbModel",
     "PydanticAutoDataSet",
     "PydanticFolderDataSet",
@@ -17,6 +18,6 @@ from .datasets.folder import PydanticFolderDataSet
 from .datasets.json import PydanticJsonDataSet
 from .datasets.yaml import PydanticYamlDataSet
 from .datasets.zip import PydanticZipDataSet
-from .models import ArbModel
+from .models import ArbConfig, ArbModel
 from .utils import load_model, save_model
 from .version import __version__

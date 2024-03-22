@@ -7,14 +7,14 @@ from typing import Any, Dict, no_type_check
 import fsspec
 import ruamel.yaml as yaml
 from fsspec import AbstractFileSystem
-from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
+from kedro.io.core import AbstractDataset, get_filepath_str, get_protocol_and_path
 from pydantic import BaseModel
 from pydantic_yaml import to_yaml_file
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 
 
-class PydanticYamlDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticYamlDataSet(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on YAML.
 
     Please note that the Pydantic model must be JSON-serializable.

@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import fsspec
 from fsspec.implementations.zip import ZipFileSystem
-from kedro.io.core import AbstractDataSet
+from kedro.io.core import AbstractDataset
 from pydantic import BaseModel
 
 from pydantic_kedro._local_caching import get_cache_dir
@@ -15,7 +15,7 @@ from pydantic_kedro._local_caching import get_cache_dir
 from .folder import PydanticFolderDataSet
 
 
-class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticZipDataSet(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a ZIP file.
 
     This allows fields with arbitrary types.

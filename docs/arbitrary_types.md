@@ -74,7 +74,7 @@ The above code gives the following warning:
 ```python
 UserWarning: No dataset defined for __main__.Foo in `Config.kedro_map`;
 using `Config.kedro_default`:
-<class 'kedro.extras.datasets.pickle.pickle_dataset.PickleDataSet'>
+<class 'kedro_datasets.pickle.pickle_dataset.PickleDataSet'>
 ```
 
 This is because `pydantic-kedro` doesn't know how to serialize the object.
@@ -90,7 +90,7 @@ Here's a example for [pandas](https://pandas.pydata.org/) and Pydantic V1:
 
 ```python
 import pandas as pd
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas import ParquetDataSet
 from pydantic import validator
 from pydantic_kedro import ArbModel, PydanticZipDataSet
 
