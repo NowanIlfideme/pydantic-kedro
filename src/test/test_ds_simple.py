@@ -7,11 +7,11 @@ from kedro.io.core import AbstractDataset
 from pydantic import BaseModel
 
 from pydantic_kedro import (
-    PydanticAutoDataSet,
-    PydanticFolderDataSet,
-    PydanticJsonDataSet,
-    PydanticYamlDataSet,
-    PydanticZipDataSet,
+    PydanticAutoDataset,
+    PydanticFolderDataset,
+    PydanticJsonDataset,
+    PydanticYamlDataset,
+    PydanticZipDataset,
 )
 
 
@@ -26,11 +26,11 @@ class SimpleTestModel(BaseModel):
 
 
 types = [
-    PydanticJsonDataSet,
-    PydanticYamlDataSet,
-    PydanticFolderDataSet,
-    PydanticZipDataSet,
-    PydanticAutoDataSet,
+    PydanticJsonDataset,
+    PydanticYamlDataset,
+    PydanticFolderDataset,
+    PydanticZipDataset,
+    PydanticAutoDataset,
 ]
 
 

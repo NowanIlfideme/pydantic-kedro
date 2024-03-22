@@ -4,7 +4,7 @@ Advanced serialization for [Pydantic](https://docs.pydantic.dev/) models
 via [Kedro](https://kedro.readthedocs.io/en/stable/index.html) and
 [fsspec](https://filesystem-spec.readthedocs.io/en/latest/).
 
-This package implements custom Kedro DataSet types for not only "pure" (JSON-serializable)
+This package implements custom Kedro Dataset types for not only "pure" (JSON-serializable)
 Pydantic models, but also models with [`arbitrary_types_allowed`](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed).
 
 Keep reading for a basic tutorial,
@@ -20,7 +20,7 @@ and [Datasets](https://docs.kedro.org/en/stable/data/kedro_io.html).
 
 ## Usage with Kedro
 
-You can use the [PydanticAutoDataSet][pydantic_kedro.PydanticAutoDataSet]
+You can use the [PydanticAutoDataset][pydantic_kedro.PydanticAutoDataset]
 or any other dataset from `pydantic-kedro` within your
 [Kedro catalog](https://docs.kedro.org/en/stable/get_started/kedro_concepts.html#data-catalog)
 to save your Pydantic models:
@@ -28,7 +28,7 @@ to save your Pydantic models:
 ```yaml
 # conf/base/catalog.yml
 my_pydantic_model:
- type: pydantic_kedro.PydanticAutoDataSet
+ type: pydantic_kedro.PydanticAutoDataset
  filepath: folder/my_model
 ```
 
@@ -66,13 +66,13 @@ See [the relevant docs](standalone_usage.md) for more info.
 ## "Pure" Pydantic Models
 
 If you have a JSON-safe Pydantic model, you can use a
-[PydanticJsonDataSet][pydantic_kedro.PydanticJsonDataSet]
-or [PydanticYamlDataSet][pydantic_kedro.PydanticYamlDataSet]
+[PydanticJsonDataset][pydantic_kedro.PydanticJsonDataset]
+or [PydanticYamlDataset][pydantic_kedro.PydanticYamlDataset]
 to save your model to any `fsspec`-supported location:
 
 ```python
 from pydantic import BaseModel
-from pydantic_kedro import PydanticJsonDataSet
+from pydantic_kedro import PydanticJsonDataset
 
 
 class MyPureModel(BaseModel):
@@ -85,7 +85,7 @@ class MyPureModel(BaseModel):
 obj = MyPureModel(x=1, y="why?")
 
 # Create an in-memory (temporary) file via `fsspec` and save it
-ds = PydanticJsonDataSet("memory://temporary-file.json")
+ds = PydanticJsonDataset("memory://temporary-file.json")
 ds.save(obj)
 
 # We can re-load it from the same file
@@ -104,7 +104,7 @@ JSON, read on to [Arbitrary Types](./arbitrary_types.md).
 ## Automatic Saving of Pydantic Models
 
 The easiest way to use `pydantic-kedro` (since `v0.2.0`) is through the
-[PydanticAutoDataSet][pydantic_kedro.PydanticAutoDataSet].
+[PydanticAutoDataset][pydantic_kedro.PydanticAutoDataset].
 You can use it in the place of any other dataset for reading or writing.
 
 When reading, it will figure out what the actual dataset type is.
@@ -112,5 +112,5 @@ When writing, it will try to save it as a pure model, or fallback to an arbitrar
 depending on the options set. Below you can see the default options:
 
 ```python
-PydanticAutoDataSet(path, default_format_pure="yaml", default_format_arbitrary="zip")
+PydanticAutoDataset(path, default_format_pure="yaml", default_format_arbitrary="zip")
 ```

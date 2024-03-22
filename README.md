@@ -13,7 +13,7 @@ and more examples.
 
 ## Usage with Kedro
 
-You can use the [PydanticAutoDataSet][pydantic_kedro.PydanticAutoDataSet]
+You can use the [PydanticAutoDataset][pydantic_kedro.PydanticAutoDataset]
 or any other dataset from `pydantic-kedro` within your
 [Kedro catalog](https://docs.kedro.org/en/stable/get_started/kedro_concepts.html#data-catalog)
 to save your Pydantic models:
@@ -21,18 +21,18 @@ to save your Pydantic models:
 ```yaml
 # conf/base/catalog.yml
 my_pydantic_model:
- type: pydantic_kedro.PydanticAutoDataSet
+ type: pydantic_kedro.PydanticAutoDataset
  filepath: folder/my_model
 ```
 
 ## Direct Dataset Usage
 
 This example works for "pure", JSON-safe Pydantic models via
-`PydanticJsonDataSet`:
+`PydanticJsonDataset`:
 
 ```python
 from pydantic import BaseModel
-from pydantic_kedro import PydanticJsonDataSet
+from pydantic_kedro import PydanticJsonDataset
 
 
 class MyPureModel(BaseModel):
@@ -45,7 +45,7 @@ class MyPureModel(BaseModel):
 obj = MyPureModel(x=1, y="why?")
 
 # Create an in-memory (temporary) file via `fsspec` and save it
-ds = PydanticJsonDataSet("memory://temporary-file.json")
+ds = PydanticJsonDataset("memory://temporary-file.json")
 ds.save(obj)
 
 # We can re-load it from the same file

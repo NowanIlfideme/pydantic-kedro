@@ -28,7 +28,7 @@ class ArbModel(BaseModel):
 
     - `kedro_map`, which maps a type to a dataset constructor to use.
     - `kedro_default`, which specifies the default dataset type to use
-      ([kedro_datasets.pickle.PickleDataSet][])
+      ([kedro_datasets.pickle.PickleDataset][])
 
     These are pseudo-inherited, see [config-inheritence][].
     You do not actually need to inherit from `ArbModel` for this to work, however it can help with
