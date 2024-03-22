@@ -3,7 +3,7 @@
 from typing import Any, Union
 
 import pytest
-from kedro.extras.datasets.spark import SparkDataSet
+from kedro_datasets.spark.spark_dataset import SparkDataset
 from pyspark.sql import DataFrame, SparkSession
 
 from pydantic_kedro import (
@@ -20,7 +20,7 @@ class _SparkModel(ArbModel):
     """Spark model, configured to use SparkDataSet (mult-file parquet)."""
 
     class Config(ArbModel.Config):
-        kedro_map = {DataFrame: SparkDataSet}
+        kedro_map = {DataFrame: SparkDataset}
 
 
 class FlatSparkModel(_SparkModel):

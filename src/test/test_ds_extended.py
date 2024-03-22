@@ -1,8 +1,9 @@
 """Test extended models, but without external libraries."""
+
 from typing import Any, Dict, Union
 
 import pytest
-from kedro.extras.datasets.text import TextDataSet
+from kedro_datasets.text.text_dataset import TextDataset
 
 from pydantic_kedro import (
     ArbModel,
@@ -41,7 +42,7 @@ class MyStr:
         return self.v
 
 
-class MyStrDs(TextDataSet):
+class MyStrDs(TextDataset):
     """Custom dataset for loading MyStr type."""
 
     def _load(self) -> MyStr:

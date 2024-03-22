@@ -2,7 +2,7 @@
 
 from typing import Literal, Type, TypeVar
 
-from kedro.io.core import AbstractDataSet
+from kedro.io.core import AbstractDataset
 from pydantic import BaseModel
 
 from pydantic_kedro.datasets.auto import PydanticAutoDataSet
@@ -54,7 +54,7 @@ def save_model(
     """
     if not isinstance(model, BaseModel):
         raise TypeError(f"Expected Pydantic model, but got {model!r}")
-    ds: AbstractDataSet
+    ds: AbstractDataset
     if format == "auto":
         ds = PydanticAutoDataSet(uri)
     elif format == "zip":

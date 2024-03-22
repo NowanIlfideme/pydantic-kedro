@@ -2,8 +2,8 @@
 
 from typing import Any, Callable, Dict, Type
 
-from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.io.core import AbstractDataSet
+from kedro_datasets.pickle.pickle_dataset import PickleDataset
+from kedro.io.core import AbstractDataset
 from pydantic import BaseModel, create_model
 
 KLS_MARK_STR = "class"
@@ -46,11 +46,11 @@ def import_string(dotted_path: str) -> Any:
     return obj
 
 
-def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDataSet]]:
+def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDataset]]:
     """Get type-to-dataset mapper for a Pydantic class."""
     if not (isinstance(kls, type) and issubclass(kls, BaseModel)):
         raise TypeError(f"Must pass a BaseModel subclass; got {kls!r}")
-    kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = {}
+    kedro_map: Dict[Type, Callable[[str], AbstractDataset]] = {}
     # Go through bases of `kls` in order
     base_classes = reversed(kls.mro())
     for base_i in base_classes:
@@ -88,7 +88,7 @@ def get_kedro_map(kls: Type[BaseModel]) -> Dict[Type, Callable[[str], AbstractDa
     return kedro_map
 
 
-def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
+def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataset]:
     """Get default Kedro dataset creator."""
     # Go backwards through bases of `kls` until you find a default value
     rev_bases = kls.mro()
@@ -103,20 +103,20 @@ def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataSet]:
             continue
         elif callable(default):
             # Special check for types
-            if isinstance(default, type) and not issubclass(default, AbstractDataSet):
+            if isinstance(default, type) and not issubclass(default, AbstractDataset):
                 raise TypeError(
-                    "The `kedro_default` must be an AbstractDataSet or callable that creates one,"
+                    "The `kedro_default` must be an AbstractDataset or callable that creates one,"
                     f" but got {default!r}"
                 )
             # TODO: Check callable signature?
             return default
         else:
             raise TypeError(
-                "The `kedro_default` must be an AbstractDataSet or callable that creates one,"
+                "The `kedro_default` must be an AbstractDataset or callable that creates one,"
                 f" but got {default!r}"
             )
 
-    return PickleDataSet
+    return PickleDataset
 
 
 def create_expanded_model(model: BaseModel) -> BaseModel:

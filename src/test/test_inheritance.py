@@ -5,8 +5,9 @@ from typing import Type, Union
 
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pandas import CSVDataSet, ParquetDataSet
-from kedro.extras.datasets.pickle import PickleDataSet
+from kedro_datasets.pandas.csv_dataset import CSVDataset
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
+from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from pydantic import BaseModel
 
 from pydantic_kedro import PydanticFolderDataSet
@@ -21,7 +22,7 @@ class BaseA(BaseModel):
         """Config for pydantic-kedro."""
 
         arbitrary_types_allowed = True
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+        kedro_map = {pd.DataFrame: ParquetDataset}
 
 
 class Model1A(BaseA):
@@ -30,9 +31,9 @@ class Model1A(BaseA):
     df: pd.DataFrame
 
 
-def csv_ds(path: str) -> CSVDataSet:
+def csv_ds(path: str) -> CSVDataset:
     """Create a CSV dataset."""
-    return CSVDataSet(path, save_args=dict(index=False), load_args=dict())
+    return CSVDataset(path, save_args=dict(index=False), load_args=dict())
 
 
 class BaseB(BaseA):
@@ -73,8 +74,8 @@ class BaseD(BaseC):
     class Config:
         """Config for pydantic-kedro."""
 
-        kedro_map = {Fake: PickleDataSet}
-        kedro_default = ParquetDataSet  # Bad idea in practice, but this is for the test
+        kedro_map = {Fake: PickleDataset}
+        kedro_default = ParquetDataset  # Bad idea in practice, but this is for the test
 
 
 class Model1D(BaseD):
@@ -85,12 +86,12 @@ class Model1D(BaseD):
 
 @pytest.mark.parametrize(
     ["model_type", "ds_type"],
-    [[Model1A, ParquetDataSet], [Model1B, CSVDataSet], [Model1C, CSVDataSet], [Model1D, CSVDataSet]],
+    [[Model1A, ParquetDataset], [Model1B, CSVDataset], [Model1C, CSVDataset], [Model1D, CSVDataset]],
 )
 def test_pandas_flat_model(
     tmpdir,
     model_type: Type[Union[Model1A, Model1B, Model1C, Model1D]],
-    ds_type: Type[Union[ParquetDataSet, CSVDataSet]],
+    ds_type: Type[Union[ParquetDataset, CSVDataset]],
 ):
     """Test roundtripping of the different dataset models."""
     # Create and save model

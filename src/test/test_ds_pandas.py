@@ -4,7 +4,7 @@ from typing import Any, Dict, Union
 
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas import ParquetDataset
 
 from pydantic_kedro import (
     ArbModel,
@@ -22,7 +22,7 @@ class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
     class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+        kedro_map = {pd.DataFrame: ParquetDataset}
 
 
 class FlatPandasModel(ArbModel):

@@ -1,10 +1,9 @@
 """Test for standalone docs."""
 
-
 from tempfile import TemporaryDirectory
 
 import pandas as pd
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 
 from pydantic_kedro import ArbModel, load_model, save_model
 
@@ -15,7 +14,7 @@ class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
     class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+        kedro_map = {pd.DataFrame: ParquetDataset}
 
 
 class MyModel(_PdModel):

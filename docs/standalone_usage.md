@@ -30,7 +30,7 @@ Here's an example that uses a Pandas dataframe.
 from tempfile import TemporaryDirectory
 
 import pandas as pd
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas import ParquetDataSet
 from pydantic import validator
 from pydantic_kedro import ArbModel, load_model, save_model
 

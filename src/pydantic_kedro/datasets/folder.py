@@ -13,7 +13,7 @@ import fsspec
 from fsspec import AbstractFileSystem
 from fsspec.core import strip_protocol
 from fsspec.implementations.local import LocalFileSystem
-from kedro.io.core import AbstractDataSet, parse_dataset_definition
+from kedro.io.core import AbstractDataset, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
@@ -58,7 +58,7 @@ class KedroDataSetSpec(BaseModel):
         smart_union = True
 
     @classmethod
-    def from_dataset(cls, ds: AbstractDataSet, relative_path: str) -> "KedroDataSetSpec":
+    def from_dataset(cls, ds: AbstractDataset, relative_path: str) -> "KedroDataSetSpec":
         """Create spec class from dataset."""
         raw_args = ds._describe()
         # We need to actually look at the kwargs to ensure we don't pass any extra args...
@@ -74,7 +74,7 @@ class KedroDataSetSpec(BaseModel):
 
     def to_dataset(
         self, base_path: str, load_version: Optional[str] = None, save_version: Optional[str] = None
-    ) -> AbstractDataSet:
+    ) -> AbstractDataset:
         """Build the DataSet object.
 
         This assumes the local path is called `filepath`.
@@ -153,7 +153,7 @@ def get_import_name(obj: Any) -> str:
     return f"{module_i.__name__}.{r_name}"
 
 
-class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticFolderDataSet(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a folder.
 
     This allows fields with arbitrary types.
@@ -266,10 +266,10 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
         # These are used to make datasets for various types
         # See the `kls.Config` class - this is inherited
-        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = get_kedro_map(kls)
-        kedro_default: Callable[[str], AbstractDataSet] = get_kedro_default(kls)
+        kedro_map: Dict[Type, Callable[[str], AbstractDataset]] = get_kedro_map(kls)
+        kedro_default: Callable[[str], AbstractDataset] = get_kedro_default(kls)
 
-        def make_ds_for(obj: Any, path: str) -> AbstractDataSet:
+        def make_ds_for(obj: Any, path: str) -> AbstractDataset:
             for k, v in kedro_map.items():
                 if isinstance(obj, k):
                     return v(path)

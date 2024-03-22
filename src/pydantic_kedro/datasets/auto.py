@@ -4,7 +4,7 @@ from typing import Any, Dict, Literal, Union
 
 import fsspec
 from fsspec import AbstractFileSystem
-from kedro.io.core import AbstractDataSet, get_protocol_and_path
+from kedro.io.core import AbstractDataset, get_protocol_and_path
 from pydantic import BaseModel
 
 from .folder import PydanticFolderDataSet
@@ -15,7 +15,7 @@ from .zip import PydanticZipDataSet
 __all__ = ["PydanticAutoDataSet"]
 
 
-class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticAutoDataSet(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for self-describing Pydantic models.
 
     This allows fields with arbitrary types.
