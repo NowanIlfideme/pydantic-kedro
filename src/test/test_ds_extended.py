@@ -6,6 +6,7 @@ import pytest
 from kedro_datasets.text.text_dataset import TextDataset
 
 from pydantic_kedro import (
+    ArbConfig,
     ArbModel,
     PydanticAutoDataSet,
     PydanticFolderDataSet,
@@ -55,10 +56,10 @@ class MyStrDs(TextDataset):
 class UserExtendedModel(ArbModel):
     """Arbitrary model, extended with the user model."""
 
-    class Config(ArbModel.Config):
+    class Config(ArbConfig):
         """Arbitrary model configuration."""
 
-        kedro_map = {MyStr: MyStrDs}
+        kedro_map = {MyStr: lambda x: MyStrDs(filepath=x)}
 
     sing: Singleton = Singleton()
     ms: MyStr = MyStr("foobar")

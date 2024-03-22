@@ -7,13 +7,18 @@ from kedro.io import AbstractDataset
 from pydantic import BaseConfig, BaseModel
 
 
+def _kedro_default(x: str) -> PickleDataset:
+    """Definition of default dataset."""
+    return PickleDataset(filepath=x)
+
+
 class ArbConfig(BaseConfig):
     """Configuration with arbitrary types allowed; see [pydantic_kedro.ArbModel][]."""
 
     arbitrary_types_allowed = True
 
     kedro_map: Dict[Type, Callable[[str], AbstractDataset]] = {}
-    kedro_default: Callable[[str], AbstractDataset] = PickleDataset
+    kedro_default: Callable[[str], AbstractDataset] = _kedro_default
 
 
 class ArbModel(BaseModel):

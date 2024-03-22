@@ -15,6 +15,21 @@ from pydantic_kedro import PydanticFolderDataSet
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 
 
+def csv_ds(path: str) -> CSVDataset:
+    """Create a CSV dataset."""
+    return CSVDataset(filepath=path, save_args=dict(index=False), load_args=dict())
+
+
+def parquet_ds(path: str) -> ParquetDataset:
+    """Creata a Parquet dataset for Pandas."""
+    return ParquetDataset(filepath=path)
+
+
+def pickle_ds(path: str) -> PickleDataset:
+    """Creata a Pickle dataset."""
+    return PickleDataset(filepath=path)
+
+
 class BaseA(BaseModel):
     """First model in hierarchy, using Parquet for Pandas."""
 
@@ -22,18 +37,13 @@ class BaseA(BaseModel):
         """Config for pydantic-kedro."""
 
         arbitrary_types_allowed = True
-        kedro_map = {pd.DataFrame: ParquetDataset}
+        kedro_map = {pd.DataFrame: parquet_ds}
 
 
 class Model1A(BaseA):
     """Model with Parquet dataset base."""
 
     df: pd.DataFrame
-
-
-def csv_ds(path: str) -> CSVDataset:
-    """Create a CSV dataset."""
-    return CSVDataset(path, save_args=dict(index=False), load_args=dict())
 
 
 class BaseB(BaseA):
@@ -74,8 +84,9 @@ class BaseD(BaseC):
     class Config:
         """Config for pydantic-kedro."""
 
-        kedro_map = {Fake: PickleDataset}
-        kedro_default = ParquetDataset  # Bad idea in practice, but this is for the test
+        kedro_map = {Fake: pickle_ds}
+        # Bad idea in practice, but this is for the test
+        kedro_default = parquet_ds
 
 
 class Model1D(BaseD):
@@ -99,5 +110,5 @@ def test_pandas_flat_model(
     path = Path(f"{tmpdir}/model_on_disk")
     PydanticFolderDataSet(str(path)).save(model)
     # Try loading with the supposed dataframe type
-    found_df = ds_type(str(path / ".df")).load()
+    found_df = ds_type(filepath=str(path / ".df")).load()
     assert isinstance(found_df, pd.DataFrame)

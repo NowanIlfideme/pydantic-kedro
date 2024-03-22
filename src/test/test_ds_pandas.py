@@ -4,9 +4,10 @@ from typing import Any, Dict, Union
 
 import pandas as pd
 import pytest
-from kedro_datasets.pandas import ParquetDataset
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 
 from pydantic_kedro import (
+    ArbConfig,
     ArbModel,
     PydanticAutoDataSet,
     PydanticFolderDataSet,
@@ -21,8 +22,8 @@ dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
-    class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataset}
+    class Config(ArbConfig):
+        kedro_map = {pd.DataFrame: lambda x: ParquetDataset(filepath=x)}
 
 
 class FlatPandasModel(ArbModel):
