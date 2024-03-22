@@ -28,8 +28,8 @@ obj = MyPureModel(x=1, y="why?")
 def test_basic_catalog():
     """Basic test to ensure."""
     os.chdir(local_dir)
-    conf_loader = OmegaConfigLoader(str(local_dir / "conf"))
-    catalog = DataCatalog.from_config(conf_loader.get("catalog.yml"))
+    conf_loader = OmegaConfigLoader(str(local_dir / "conf"), env="local")
+    catalog = DataCatalog.from_config(conf_loader["catalog"])
     obj2 = catalog.load("tst1")
     assert isinstance(catalog.datasets.tst1, PydanticJsonDataSet)  # type: ignore
     assert obj2 == obj
