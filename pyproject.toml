@@ -21,9 +21,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pydantic>=1.10.0,<2",
+    "pydantic>=1.10.0,<2",   # TODO
     "pydantic-yaml>=1.1.2",
-    "kedro",
+    "ruamel-yaml<0.18",      # Current limitation
+    "kedro>=0.19.3",
+    "kedro-datasets>=2.1.0",
     "fsspec",
 ]
 urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
@@ -32,16 +34,18 @@ urls = { github = "https://github.com/NowanIlfideme/pydantic-kedro" }
 dev = [
     "setuptools>=61.0.0",
     "setuptools-scm[toml]>=6.2",
-    "pre-commit==3.5.0",
+    "pre-commit==3.6.0",
     "black==23.11.0",
     "isort==5.12.0",
-    "ruff==0.0.291",
-    "mypy==1.5.1",
+    "ruff==0.3.4",
+    "mypy==1.9.0",
     "pytest==7.4.2",
     # required for testing
     "pandas>=1.5.3,<2.2.0",
     "pyspark>=3.4.1,<3.6.0",
-    "kedro[pandas,spark]",
+    "kedro-datasets[pandas,spark]",
+    # Stubs
+    "pandas-stubs",
 ]
 docs = [
     "mkdocs",
@@ -114,6 +118,7 @@ module = [
     "fsspec.*",
     "cloudpickle",
     "fusepy",
-    "ruamel.yaml",
+    "ruamel.*",
+    "kedro_datasets.*",
 ]
 ignore_missing_imports = true

@@ -3,24 +3,25 @@
 from typing import Any, Union
 
 import pytest
-from kedro.extras.datasets.spark import SparkDataSet
+from kedro_datasets.spark.spark_dataset import SparkDataset
 from pyspark.sql import DataFrame, SparkSession
 
 from pydantic_kedro import (
+    ArbConfig,
     ArbModel,
-    PydanticAutoDataSet,
-    PydanticFolderDataSet,
-    PydanticZipDataSet,
+    PydanticAutoDataset,
+    PydanticFolderDataset,
+    PydanticZipDataset,
 )
 
-Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
+Kls = Union[PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset]
 
 
 class _SparkModel(ArbModel):
-    """Spark model, configured to use SparkDataSet (mult-file parquet)."""
+    """Spark model, configured to use SparkDataset (mult-file parquet)."""
 
-    class Config(ArbModel.Config):
-        kedro_map = {DataFrame: SparkDataSet}
+    class Config(ArbConfig):
+        kedro_map = {DataFrame: lambda x: SparkDataset(filepath=x)}
 
 
 class FlatSparkModel(_SparkModel):
@@ -36,7 +37,7 @@ def spark() -> SparkSession:
     return SparkSession.Builder().appName("pydantic-kedro-testing").getOrCreate()
 
 
-@pytest.mark.parametrize("kls", [PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet])
+@pytest.mark.parametrize("kls", [PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset])
 @pytest.mark.parametrize(
     "df_raw",
     [
@@ -44,8 +45,8 @@ def spark() -> SparkSession:
     ],
 )
 def test_spark_flat_model(kls: Kls, df_raw: list[dict[str, Any]], spark: SparkSession, tmpdir):
-    """Test roundtripping of the flat Spark model, using Kedro's SparkDataSet."""
-    dfx = spark.createDataFrame(df_raw)
+    """Test roundtripping of the flat Spark model, using Kedro's SparkDataset."""
+    dfx = spark.createDataFrame(df_raw)  # type: ignore
     mdl = FlatSparkModel(df=dfx, val=1)
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]
     for path in paths:

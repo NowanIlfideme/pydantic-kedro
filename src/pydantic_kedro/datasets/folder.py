@@ -13,14 +13,14 @@ import fsspec
 from fsspec import AbstractFileSystem
 from fsspec.core import strip_protocol
 from fsspec.implementations.local import LocalFileSystem
-from kedro.io.core import AbstractDataSet, parse_dataset_definition
+from kedro.io.core import AbstractDataset, parse_dataset_definition
 from pydantic import BaseConfig, BaseModel, Extra, Field
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 from pydantic_kedro._internals import get_kedro_default, get_kedro_map, import_string
 from pydantic_kedro._local_caching import get_cache_dir
 
-__all__ = ["PydanticFolderDataSet"]
+__all__ = ["PydanticFolderDataset"]
 
 
 DATA_PLACEHOLDER = "__DATA_PLACEHOLDER__"
@@ -39,7 +39,7 @@ _Dis4 = Dict[str, Union[_Bis, _Dis1, _Dis2, _Dis3]]
 # basically, Dict[str, Union[_Bis, Dict[str, Union[_Bis, Dict[str, _Bis]]]]], but better :)
 
 
-class KedroDataSetSpec(BaseModel):
+class KedroDatasetSpec(BaseModel):
     """Kedro dataset specification. This allows arbitrary extra fields, including versions.
 
     Unfortunately, because there's no standard on how to specify "file paths", this will likely fail
@@ -58,7 +58,7 @@ class KedroDataSetSpec(BaseModel):
         smart_union = True
 
     @classmethod
-    def from_dataset(cls, ds: AbstractDataSet, relative_path: str) -> "KedroDataSetSpec":
+    def from_dataset(cls, ds: AbstractDataset, relative_path: str) -> "KedroDatasetSpec":
         """Create spec class from dataset."""
         raw_args = ds._describe()
         # We need to actually look at the kwargs to ensure we don't pass any extra args...
@@ -74,8 +74,8 @@ class KedroDataSetSpec(BaseModel):
 
     def to_dataset(
         self, base_path: str, load_version: Optional[str] = None, save_version: Optional[str] = None
-    ) -> AbstractDataSet:
-        """Build the DataSet object.
+    ) -> AbstractDataset:
+        """Build the Dataset object.
 
         This assumes the local path is called `filepath`.
         """
@@ -99,7 +99,7 @@ class KedroDataSetSpec(BaseModel):
         return kls(**params)  # type: ignore
 
 
-KedroDataSetSpec.update_forward_refs()
+KedroDatasetSpec.update_forward_refs()
 
 
 class FolderFormatMetadata(BaseModel):
@@ -119,7 +119,7 @@ class FolderFormatMetadata(BaseModel):
 
     model_class: str
     model_info: Dict[str, Any]
-    catalog: Dict[JsonPath, KedroDataSetSpec] = {}
+    catalog: Dict[JsonPath, KedroDatasetSpec] = {}
     # pydantic_types: Dict[JsonPath, ImportStr] = {}
 
 
@@ -153,7 +153,7 @@ def get_import_name(obj: Any) -> str:
     return f"{module_i.__name__}.{r_name}"
 
 
-class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticFolderDataset(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a folder.
 
     This allows fields with arbitrary types.
@@ -164,14 +164,14 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
     class MyModel(BaseModel):
         x: str
 
-    ds = PydanticFolderDataSet('memory://path/to/model')  # using in-memory to avoid tempfile
+    ds = PydanticFolderDataset('memory://path/to/model')  # using in-memory to avoid tempfile
     ds.save(MyModel(x="example"))
     assert ds.load().x == "example"
     ```
     """
 
     def __init__(self, filepath: str) -> None:
-        """Create a new instance of PydanticFolderDataSet to load/save Pydantic models for given path.
+        """Create a new instance of PydanticFolderDataset to load/save Pydantic models for given path.
 
         Args:
         ----
@@ -262,14 +262,14 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
         kls = type(data)
         model_class_str = get_import_name(kls)
         model_info: Union[Dict[str, Any], List[Any]] = {}
-        catalog: Dict[JsonPath, KedroDataSetSpec] = {}
+        catalog: Dict[JsonPath, KedroDatasetSpec] = {}
 
         # These are used to make datasets for various types
         # See the `kls.Config` class - this is inherited
-        kedro_map: Dict[Type, Callable[[str], AbstractDataSet]] = get_kedro_map(kls)
-        kedro_default: Callable[[str], AbstractDataSet] = get_kedro_default(kls)
+        kedro_map: Dict[Type, Callable[[str], AbstractDataset]] = get_kedro_map(kls)
+        kedro_default: Callable[[str], AbstractDataset] = get_kedro_default(kls)
 
-        def make_ds_for(obj: Any, path: str) -> AbstractDataSet:
+        def make_ds_for(obj: Any, path: str) -> AbstractDataset:
             for k, v in kedro_map.items():
                 if isinstance(obj, k):
                     return v(path)
@@ -308,7 +308,7 @@ class PydanticFolderDataSet(AbstractDataSet[BaseModel, BaseModel]):
                     full_path = f"{base_path}/{jsp}"
                     ds = make_ds_for(data, full_path)
                     # Get the spec (or fail because of non-JSON-able types...)
-                    dss = KedroDataSetSpec.from_dataset(ds, jsp)
+                    dss = KedroDatasetSpec.from_dataset(ds, jsp)
                     dss.json()  # to fail early
                     catalog[jsp] = dss  # add to catalog
                     # Save the data

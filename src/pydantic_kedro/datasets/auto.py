@@ -4,18 +4,18 @@ from typing import Any, Dict, Literal, Union
 
 import fsspec
 from fsspec import AbstractFileSystem
-from kedro.io.core import AbstractDataSet, get_protocol_and_path
+from kedro.io.core import AbstractDataset, get_protocol_and_path
 from pydantic import BaseModel
 
-from .folder import PydanticFolderDataSet
-from .json import PydanticJsonDataSet
-from .yaml import PydanticYamlDataSet
-from .zip import PydanticZipDataSet
+from .folder import PydanticFolderDataset
+from .json import PydanticJsonDataset
+from .yaml import PydanticYamlDataset
+from .zip import PydanticZipDataset
 
-__all__ = ["PydanticAutoDataSet"]
+__all__ = ["PydanticAutoDataset"]
 
 
-class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticAutoDataset(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for self-describing Pydantic models.
 
     This allows fields with arbitrary types.
@@ -30,10 +30,10 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
         x: str
 
     # using memory to avoid tempfile
-    ds_write = PydanticZipDataSet('memory://path/to/model.zip')
+    ds_write = PydanticZipDataset('memory://path/to/model.zip')
     ds_write.save(MyModel(x="example"))
 
-    ds_load = PydanticAutoDataSet('memory://path/to/model.zip')
+    ds_load = PydanticAutoDataset('memory://path/to/model.zip')
     assert ds_load.load().x == "example"
     ```
 
@@ -44,10 +44,10 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
         x: str
 
     # using memory to avoid tempfile
-    ds = PydanticAutoDataSet('memory://path/to/model')
+    ds = PydanticAutoDataset('memory://path/to/model')
     ds.save(MyModel(x="example"))  # selects YAML by default
 
-    ds2 = PydanticAutoDataSet(
+    ds2 = PydanticAutoDataset(
         'memory://path/to/model',
         default_format_pure="json",
         default_format_arbitrary="folder",
@@ -62,7 +62,7 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
         default_format_pure: Literal["yaml", "json", "zip", "folder"] = "yaml",
         default_format_arbitrary: Literal["zip", "folder"] = "zip",
     ) -> None:
-        """Create a new instance of PydanticAutoDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticAutoDataset to load/save Pydantic models for given filepath.
 
         Args:
         ----
@@ -93,16 +93,16 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
     def _get_ds(
         self, name: Literal["yaml", "json", "zip", "folder"]
-    ) -> Union[PydanticYamlDataSet, PydanticJsonDataSet, PydanticFolderDataSet, PydanticZipDataSet]:
+    ) -> Union[PydanticYamlDataset, PydanticJsonDataset, PydanticFolderDataset, PydanticZipDataset]:
         """Map the format name to dataset type, and create it."""
         if name == "yaml":
-            return PydanticYamlDataSet(self.filepath)
+            return PydanticYamlDataset(self.filepath)
         if name == "json":
-            return PydanticJsonDataSet(self.filepath)
+            return PydanticJsonDataset(self.filepath)
         if name == "zip":
-            return PydanticZipDataSet(self.filepath)
+            return PydanticZipDataset(self.filepath)
         if name == "folder":
-            return PydanticFolderDataSet(self.filepath)
+            return PydanticFolderDataset(self.filepath)
         raise ValueError(f"Unknown dataset keyword: {name}")
 
     def _load(self) -> BaseModel:
@@ -120,7 +120,7 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # If it's a directory, try to open as a folder
         if fs.isdir(path):
             try:
-                return PydanticFolderDataSet(filepath).load()
+                return PydanticFolderDataset(filepath).load()
             except Exception as exc:
                 raise RuntimeError(
                     f"Path {filepath} is a directory, but failed to load PydanticFolderDataset from it."
@@ -130,17 +130,17 @@ class PydanticAutoDataSet(AbstractDataSet[BaseModel, BaseModel]):
         # Yes, this looks hacky
         errors: list[Exception] = []
         try:
-            return PydanticJsonDataSet(filepath).load()
+            return PydanticJsonDataset(filepath).load()
         except Exception as e1:
             errors.append(e1)
 
         try:
-            return PydanticYamlDataSet(filepath).load()
+            return PydanticYamlDataset(filepath).load()
         except Exception as e2:
             errors.append(e2)
 
         try:
-            return PydanticZipDataSet(filepath).load()
+            return PydanticZipDataset(filepath).load()
         except Exception as e3:
             errors.append(e3)
 

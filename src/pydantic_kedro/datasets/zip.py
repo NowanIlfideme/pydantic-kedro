@@ -7,15 +7,15 @@ from uuid import uuid4
 
 import fsspec
 from fsspec.implementations.zip import ZipFileSystem
-from kedro.io.core import AbstractDataSet
+from kedro.io.core import AbstractDataset
 from pydantic import BaseModel
 
 from pydantic_kedro._local_caching import get_cache_dir
 
-from .folder import PydanticFolderDataSet
+from .folder import PydanticFolderDataset
 
 
-class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticZipDataset(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on saving sub-datasets in a ZIP file.
 
     This allows fields with arbitrary types.
@@ -26,14 +26,14 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
     class MyModel(BaseModel):
         x: str
 
-    ds = PydanticZipDataSet('memory://path/to/model.zip')  # using memory to avoid tempfile
+    ds = PydanticZipDataset('memory://path/to/model.zip')  # using memory to avoid tempfile
     ds.save(MyModel(x="example"))
     assert ds.load().x == "example"
     ```
     """
 
     def __init__(self, filepath: str) -> None:
-        """Create a new instance of PydanticZipDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticZipDataset to load/save Pydantic models for given filepath.
 
         Args:
         ----
@@ -66,7 +66,7 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
                 m_local[k] = v
             zip_fs.close()
         # Load folder dataset
-        pfds = PydanticFolderDataSet(str(tmpdir))
+        pfds = PydanticFolderDataset(str(tmpdir))
         res = pfds.load()
         return res
 
@@ -84,7 +84,7 @@ class PydanticZipDataSet(AbstractDataSet[BaseModel, BaseModel]):
 
         with TemporaryDirectory(prefix="pyd_kedro_") as tmpdir:
             # Save folder dataset
-            pfds = PydanticFolderDataSet(tmpdir)
+            pfds = PydanticFolderDataset(tmpdir)
             pfds.save(data)
             # Zip via copying to folder
             m_local = fsspec.get_mapper(tmpdir)

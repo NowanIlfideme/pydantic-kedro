@@ -2,14 +2,14 @@
 
 from typing import Literal, Type, TypeVar
 
-from kedro.io.core import AbstractDataSet
+from kedro.io.core import AbstractDataset
 from pydantic import BaseModel
 
-from pydantic_kedro.datasets.auto import PydanticAutoDataSet
-from pydantic_kedro.datasets.folder import PydanticFolderDataSet
-from pydantic_kedro.datasets.json import PydanticJsonDataSet
-from pydantic_kedro.datasets.yaml import PydanticYamlDataSet
-from pydantic_kedro.datasets.zip import PydanticZipDataSet
+from pydantic_kedro.datasets.auto import PydanticAutoDataset
+from pydantic_kedro.datasets.folder import PydanticFolderDataset
+from pydantic_kedro.datasets.json import PydanticJsonDataset
+from pydantic_kedro.datasets.yaml import PydanticYamlDataset
+from pydantic_kedro.datasets.zip import PydanticZipDataset
 
 __all__ = ["load_model", "save_model"]
 
@@ -27,7 +27,7 @@ def load_model(uri: str, supercls: Type[T] = BaseModel) -> T:  # type: ignore
         Ensure that the loaded model is of this type.
         By default, this is just BaseModel.
     """
-    ds = PydanticAutoDataSet(filepath=uri)
+    ds = PydanticAutoDataset(filepath=uri)
     model = ds.load()
     if not isinstance(model, supercls):
         raise TypeError(f"Expected {supercls}, but got {type(model)}.")
@@ -50,21 +50,21 @@ def save_model(
         The path or URI to save the model to.
     format : {"auto", "zip", "folder", "yaml", "json"}
         The dataset format to use.
-        "auto" will use [PydanticAutoDataSet][pydantic_kedro.PydanticAutoDataSet].
+        "auto" will use [PydanticAutoDataset][pydantic_kedro.PydanticAutoDataset].
     """
     if not isinstance(model, BaseModel):
         raise TypeError(f"Expected Pydantic model, but got {model!r}")
-    ds: AbstractDataSet
+    ds: AbstractDataset
     if format == "auto":
-        ds = PydanticAutoDataSet(uri)
+        ds = PydanticAutoDataset(uri)
     elif format == "zip":
-        ds = PydanticZipDataSet(uri)
+        ds = PydanticZipDataset(uri)
     elif format == "folder":
-        ds = PydanticFolderDataSet(uri)
+        ds = PydanticFolderDataset(uri)
     elif format == "yaml":
-        ds = PydanticYamlDataSet(uri)
+        ds = PydanticYamlDataset(uri)
     elif format == "json":
-        ds = PydanticJsonDataSet(uri)
+        ds = PydanticJsonDataset(uri)
     else:
         raise ValueError(
             f"Unknown dataset format {format}, "

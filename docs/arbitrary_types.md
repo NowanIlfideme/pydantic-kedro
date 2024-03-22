@@ -3,15 +3,15 @@
 Pydantic [supports models with arbitrary types](https://docs.pydantic.dev/usage/types/#arbitrary-types-allowed)
 if you specify it in the model's config.
 You can't save/load these via JSON, but you can use the other dataset types:
-[PydanticFolderDataSet][pydantic_kedro.PydanticFolderDataSet] and
-[PydanticZipDataSet][pydantic_kedro.PydanticZipDataSet].
+[PydanticFolderDataset][pydantic_kedro.PydanticFolderDataset] and
+[PydanticZipDataset][pydantic_kedro.PydanticZipDataset].
 
 ## Usage Example
 
 ```python
 from tempfile import TemporaryDirectory
 from pydantic import BaseModel
-from pydantic_kedro import PydanticZipDataSet
+from pydantic_kedro import PydanticZipDataset
 
 
 class Foo(object):
@@ -44,7 +44,7 @@ except TypeError as err:
 # We can, however,
 with TemporaryDirectory() as tmpdir:
     # Create an on-disk (temporary) file via `fsspec` and save it
-    ds = PydanticZipDataSet(f"{tmpdir}/arb.zip")
+    ds = PydanticZipDataset(f"{tmpdir}/arb.zip")
     ds.save(obj)
 
     # We can re-load it from the same file
@@ -74,11 +74,11 @@ The above code gives the following warning:
 ```python
 UserWarning: No dataset defined for __main__.Foo in `Config.kedro_map`;
 using `Config.kedro_default`:
-<class 'kedro.extras.datasets.pickle.pickle_dataset.PickleDataSet'>
+<class 'kedro_datasets.pickle.pickle_dataset.PickleDataset'>
 ```
 
 This is because `pydantic-kedro` doesn't know how to serialize the object.
-The default is Kedro's `PickleDataSet`, which will generally work only if the same
+The default is Kedro's `PickleDataset`, which will generally work only if the same
 Python version and libraries are installed on the client that reads the dataset.
 
 ## Defining Datasets for Types
@@ -90,16 +90,16 @@ Here's a example for [pandas](https://pandas.pydata.org/) and Pydantic V1:
 
 ```python
 import pandas as pd
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas import ParquetDataset
 from pydantic import validator
-from pydantic_kedro import ArbModel, PydanticZipDataSet
+from pydantic_kedro import ArbModel, PydanticZipDataset
 
 
 class MyPandasModel(ArbModel):
     """Model that saves a dataframe, along with some other data."""
 
     class Config:
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+        kedro_map = {pd.DataFrame: ParquetDataset}
 
     val: int
     df: pd.DataFrame
@@ -114,14 +114,14 @@ class MyPandasModel(ArbModel):
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 m1 = MyPandasModel(df=dfx, val=1)
 
-ds = PydanticZipDataSet(f"memory://my_model.zip")
+ds = PydanticZipDataset(f"memory://my_model.zip")
 ds.save(m1)
 
 m2 = ds.load()
 assert m2.df.equals(dfx)
 ```
 
-Internally, this uses the `ParquetDataSet` to save the dataframe as an
+Internally, this uses the `ParquetDataset` to save the dataframe as an
 [Apache Parquet](https://parquet.apache.org/) file within the Zip file,
 as well as reference it from within the JSON file. That means that, unlike
 Pickle, the file isn't "fragile" and will be readable with future versions.
@@ -136,23 +136,23 @@ That is, if you define your classes like this:
 class A(BaseModel):
     class Config:
         allow_arbitrary_types = True
-        kedro_map = {Foo: FooDataSet}
+        kedro_map = {Foo: FooDataset}
 
 
 class B(A):
     class Config:
-        kedro_map = {Bar: BarDataSet}
+        kedro_map = {Bar: BarDataset}
 
 class C(B):
     class Config:
         kedro_map = {Foo: foo_ds_maker}
-        kedro_default = DefaultDataSet
+        kedro_default = DefaultDataset
 
 ```
 
-Then class `B` will act as if `kedro_map = {Foo: FooDataSet, Bar: BarDataSet}`,
-and class `C` will act as if `kedro_map = {Foo: foo_ds_maker, Bar: BarDataSet}`
-and `kedro_default = DefaultDataSet`
+Then class `B` will act as if `kedro_map = {Foo: FooDataset, Bar: BarDataset}`,
+and class `C` will act as if `kedro_map = {Foo: foo_ds_maker, Bar: BarDataset}`
+and `kedro_default = DefaultDataset`
 
 ## Considerations
 

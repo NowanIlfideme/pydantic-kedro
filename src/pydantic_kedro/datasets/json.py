@@ -7,13 +7,13 @@ from typing import Any, Dict, no_type_check
 
 import fsspec
 from fsspec import AbstractFileSystem
-from kedro.io.core import AbstractDataSet, get_filepath_str, get_protocol_and_path
+from kedro.io.core import AbstractDataset, get_filepath_str, get_protocol_and_path
 from pydantic import BaseModel
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 
 
-class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
+class PydanticJsonDataset(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on JSON.
 
     Please note that the Pydantic model must be JSON-serializable.
@@ -26,14 +26,14 @@ class PydanticJsonDataSet(AbstractDataSet[BaseModel, BaseModel]):
     class MyModel(BaseModel):
         x: str
 
-    ds = PydanticJsonDataSet('memory://path/to/model.json')  # using memory to avoid tempfile
+    ds = PydanticJsonDataset('memory://path/to/model.json')  # using memory to avoid tempfile
     ds.save(MyModel(x="example"))
     assert ds.load().x == "example"
     ```
     """
 
     def __init__(self, filepath: str) -> None:
-        """Create a new instance of PydanticJsonDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticJsonDataset to load/save Pydantic models for given filepath.
 
         Args:
         ----

@@ -4,16 +4,17 @@ from typing import Any, Dict, Union
 
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pandas import ParquetDataSet
+from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 
 from pydantic_kedro import (
+    ArbConfig,
     ArbModel,
-    PydanticAutoDataSet,
-    PydanticFolderDataSet,
-    PydanticZipDataSet,
+    PydanticAutoDataset,
+    PydanticFolderDataset,
+    PydanticZipDataset,
 )
 
-Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
+Kls = Union[PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset]
 
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 
@@ -21,8 +22,8 @@ dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
-    class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataSet}
+    class Config(ArbConfig):
+        kedro_map = {pd.DataFrame: lambda x: ParquetDataset(filepath=x)}
 
 
 class FlatPandasModel(ArbModel):
@@ -54,7 +55,7 @@ class NestedPandasModel(_PdModel):
     any_model: Any = None
 
 
-@pytest.mark.parametrize("kls", [PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet])
+@pytest.mark.parametrize("kls", [PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset])
 def test_pandas_flat_model(kls: Kls, tmpdir):
     """Test roundtripping of the flat Pandas model, using default Pickle dataset."""
     mdl = FlatPandasModel(df=dfx, val=1)
@@ -68,7 +69,7 @@ def test_pandas_flat_model(kls: Kls, tmpdir):
         assert m2.df.equals(mdl.df)
 
 
-@pytest.mark.parametrize("kls", [PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet])
+@pytest.mark.parametrize("kls", [PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset])
 def test_pandas_nested_model(kls: Kls, tmpdir):
     """Test roundtripping of the nested Pandas model, using Parquet dataset."""
     mdl = NestedPandasModel()
