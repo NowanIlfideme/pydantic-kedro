@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import pandas as pd
 from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 
-from pydantic_kedro import ArbModel, load_model, save_model
+from pydantic_kedro import ArbConfig, ArbModel, load_model, save_model
 
 # Arbitrary model class with a few useful defaults
 
@@ -13,8 +13,8 @@ from pydantic_kedro import ArbModel, load_model, save_model
 class _PdModel(ArbModel):
     """Pandas model, configured to use Parquet."""
 
-    class Config(ArbModel.Config):
-        kedro_map = {pd.DataFrame: ParquetDataset}
+    class Config(ArbConfig):
+        kedro_map = {pd.DataFrame: lambda x: ParquetDataset(filepath=x)}
 
 
 class MyModel(_PdModel):
@@ -32,4 +32,5 @@ def test_docs_standalone_pd():
     with TemporaryDirectory() as tmpdir:
         save_model(MyModel(name="foo", data=df), f"{tmpdir}/my_model")
         obj = load_model(f"{tmpdir}/my_model")
+        assert isinstance(obj, MyModel)
         assert obj.data.equals(df)
