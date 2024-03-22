@@ -21,7 +21,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pydantic>=1.10.0,<2",   # TODO
+    "pydantic>=1.10.0,<3",   # WIP
     "pydantic-yaml>=1.1.2",
     "ruamel-yaml<0.18",      # Current limitation
     "kedro>=0.19.3,<0.20",
