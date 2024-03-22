@@ -18,6 +18,19 @@ as "pure" models, while all others will be "arbitrary" models.
 We also assume you are familiar with [Kedro's Data Catalog](https://docs.kedro.org/en/stable/data/data_catalog.html)
 and [Datasets](https://docs.kedro.org/en/stable/data/kedro_io.html).
 
+## Changes from Kedro 0.19
+
+Please note that Kedro 0.19 incorporated many backwards-incompatible changes.
+We are switching to support `kedro>=0.19` instead of `kedro<0.19`. This means:
+
+1. The `*DataSet` classes have been renamed to `*Dataset`, though the old names
+   are still available as aliases.
+2. The `kedro-datasets` package is now a necessary dependency.
+3. Thanks to changes in Kedro's datasets, most have switched to requiring
+   keyword-only arguments, especially `filename`. So instead of using a map such
+   as `{DataFrame: ParquetDataset}` you should use a function or a lambda, e.g.
+   `{DataFrame: lambda x: ParquetDataSet(filename=x)}`.
+
 ## Usage with Kedro
 
 You can use the [PydanticAutoDataset][pydantic_kedro.PydanticAutoDataset]
