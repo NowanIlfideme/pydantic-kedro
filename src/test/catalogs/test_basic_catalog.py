@@ -19,8 +19,8 @@ class MyPureModel(BaseModel):
     y: str
 
 
-# # Create an in-memory (temporary) file via `fsspec` and save it
 obj = MyPureModel(x=1, y="why?")
+# To re-create the JSON file:
 # ds = PydanticJsonDataSet(local_dir / "data/tst1.json")
 # ds.save(obj)
 
