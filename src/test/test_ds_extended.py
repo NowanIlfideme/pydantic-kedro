@@ -8,12 +8,12 @@ from kedro_datasets.text.text_dataset import TextDataset
 from pydantic_kedro import (
     ArbConfig,
     ArbModel,
-    PydanticAutoDataSet,
-    PydanticFolderDataSet,
-    PydanticZipDataSet,
+    PydanticAutoDataset,
+    PydanticFolderDataset,
+    PydanticZipDataset,
 )
 
-Kls = Union[PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet]
+Kls = Union[PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset]
 
 
 class Singleton:
@@ -69,7 +69,7 @@ class UserExtendedModel(ArbModel):
 @pytest.mark.parametrize(
     "mdl", [UserExtendedModel(), UserExtendedModel(dct={"a": Singleton(), "b": MyStr("bee")})]
 )
-@pytest.mark.parametrize("kls", [PydanticAutoDataSet, PydanticFolderDataSet, PydanticZipDataSet])
+@pytest.mark.parametrize("kls", [PydanticAutoDataset, PydanticFolderDataset, PydanticZipDataset])
 def test_pandas_flat_model(mdl: UserExtendedModel, kls: Kls, tmpdir):
     """Test roundtripping of the flat Pandas model, using default Pickle dataset."""
     paths = [f"{tmpdir}/model_on_disk", f"memory://{tmpdir}/model_in_memory"]

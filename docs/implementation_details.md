@@ -4,7 +4,7 @@
 
 ### JSON Dataset
 
-The [`PydanticJsonDataSet`][pydantic_kedro.PydanticJsonDataSet] dumps your
+The [`PydanticJsonDataset`][pydantic_kedro.PydanticJsonDataset] dumps your
 model as a self-describing JSON file.
 
 In order for the dataset to be self-describing, we add the field `"class"` to your model, which is your class's full import path.
@@ -25,8 +25,8 @@ JSON file will be:
 
 ### Folder and Zip Datasets
 
-The [`PydanticZipDataSet`][pydantic_kedro.PydanticZipDataSet] is based on the
-[`PydanticFolderDataSet`][pydantic_kedro.PydanticFolderDataSet] and just zips
+The [`PydanticZipDataset`][pydantic_kedro.PydanticZipDataset] is based on the
+[`PydanticFolderDataset`][pydantic_kedro.PydanticFolderDataset] and just zips
 the folder.
 
 The directory structure is as the following:

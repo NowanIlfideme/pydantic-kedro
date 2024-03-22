@@ -10,7 +10,7 @@ from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from pydantic import BaseModel
 
-from pydantic_kedro import PydanticFolderDataSet
+from pydantic_kedro import PydanticFolderDataset
 
 dfx = pd.DataFrame([[1, 2, 3]], columns=["a", "b", "c"])
 
@@ -108,7 +108,7 @@ def test_pandas_flat_model(
     # Create and save model
     model = model_type(df=dfx)
     path = Path(f"{tmpdir}/model_on_disk")
-    PydanticFolderDataSet(str(path)).save(model)
+    PydanticFolderDataset(str(path)).save(model)
     # Try loading with the supposed dataframe type
     found_df = ds_type(filepath=str(path / ".df")).load()
     assert isinstance(found_df, pd.DataFrame)

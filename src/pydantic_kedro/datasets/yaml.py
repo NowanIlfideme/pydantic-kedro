@@ -14,7 +14,7 @@ from pydantic_yaml import to_yaml_file
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 
 
-class PydanticYamlDataSet(AbstractDataset[BaseModel, BaseModel]):
+class PydanticYamlDataset(AbstractDataset[BaseModel, BaseModel]):
     """Dataset for saving/loading Pydantic models, based on YAML.
 
     Please note that the Pydantic model must be JSON-serializable.
@@ -27,14 +27,14 @@ class PydanticYamlDataSet(AbstractDataset[BaseModel, BaseModel]):
     class MyModel(BaseModel):
         x: str
 
-    ds = PydanticYamlDataSet('memory://path/to/model.yaml')  # using memory to avoid tempfile
+    ds = PydanticYamlDataset('memory://path/to/model.yaml')  # using memory to avoid tempfile
     ds.save(MyModel(x="example"))
     assert ds.load().x == "example"
     ```
     """
 
     def __init__(self, filepath: str) -> None:
-        """Create a new instance of PydanticYamlDataSet to load/save Pydantic models for given filepath.
+        """Create a new instance of PydanticYamlDataset to load/save Pydantic models for given filepath.
 
         Args:
         ----

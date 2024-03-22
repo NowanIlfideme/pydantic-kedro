@@ -1,4 +1,4 @@
 # Kedro catalog for testing
 tst1:
-  type: pydantic_kedro.PydanticJsonDataSet
+  type: pydantic_kedro.PydanticJsonDataset
   filepath: data/tst1.json
