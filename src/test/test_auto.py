@@ -1,6 +1,6 @@
 """Specialized tests for `PydanticAutoDataset`."""
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import PydanticAutoDataset, PydanticJsonDataset, PydanticZipDataset
 

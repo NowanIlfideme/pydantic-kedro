@@ -1,6 +1,6 @@
 """Test utility functions, loading and saving models."""
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import load_model, save_model
 

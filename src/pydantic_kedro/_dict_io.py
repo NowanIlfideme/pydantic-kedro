@@ -4,7 +4,7 @@ from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, Dict, List, Optional, Type, Union
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from ._internals import import_string
 

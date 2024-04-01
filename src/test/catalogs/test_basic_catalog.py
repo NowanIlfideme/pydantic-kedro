@@ -5,7 +5,7 @@ from pathlib import Path
 
 from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import PydanticJsonDataset
 

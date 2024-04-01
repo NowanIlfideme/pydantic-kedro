@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, Type
 
 from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from kedro.io.core import AbstractDataset
-from pydantic import BaseModel, create_model
+from pydantic.v1 import BaseModel, create_model
 
 KLS_MARK_STR = "class"
 

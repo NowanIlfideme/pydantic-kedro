@@ -4,7 +4,7 @@ from typing import Callable, Dict, Type
 
 from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from kedro.io import AbstractDataset
-from pydantic import BaseConfig, BaseModel
+from pydantic.v1 import BaseConfig, BaseModel
 
 
 def _kedro_default(x: str) -> PickleDataset:

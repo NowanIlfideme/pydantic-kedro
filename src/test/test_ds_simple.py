@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from kedro.io.core import AbstractDataset
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import (
     PydanticAutoDataset,

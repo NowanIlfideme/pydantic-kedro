@@ -8,7 +8,7 @@ import pytest
 from kedro_datasets.pandas.csv_dataset import CSVDataset
 from kedro_datasets.pandas.parquet_dataset import ParquetDataset
 from kedro_datasets.pickle.pickle_dataset import PickleDataset
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import PydanticFolderDataset
 

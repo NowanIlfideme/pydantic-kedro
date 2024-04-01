@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Dict, List, Literal
 
 import pytest
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from pydantic_kedro import load_model, save_model
 
