@@ -124,3 +124,7 @@ module = [
     "kedro_datasets.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pydantic.v1"]
+ignore_missing_imports = true

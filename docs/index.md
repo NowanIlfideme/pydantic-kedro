@@ -48,7 +48,8 @@ my_pydantic_model:
 Then use it as usual within your Kedro pipelines:
 
 ```python
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
+# from pydantic.v1 import BaseModel  # Pydantic V2 
 from kedro.pipeline import node
 
 class SomeModel(BaseModel):
@@ -84,7 +85,8 @@ or [PydanticYamlDataset][pydantic_kedro.PydanticYamlDataset]
 to save your model to any `fsspec`-supported location:
 
 ```python
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
+# from pydantic.v1 import BaseModel  # Pydantic V2
 from pydantic_kedro import PydanticJsonDataset
 
 

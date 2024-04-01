@@ -5,9 +5,9 @@ from pathlib import Path
 
 from kedro.config import OmegaConfigLoader
 from kedro.io import DataCatalog
-from pydantic.v1 import BaseModel
 
 from pydantic_kedro import PydanticJsonDataset
+from pydantic_kedro._pydantic import BaseModel
 
 local_dir = Path(__file__).parent
 

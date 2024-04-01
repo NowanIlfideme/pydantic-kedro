@@ -31,7 +31,8 @@ This example works for "pure", JSON-safe Pydantic models via
 `PydanticJsonDataset`:
 
 ```python
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
+# from pydantic.v1 import BaseModel  # Pydantic V2
 from pydantic_kedro import PydanticJsonDataset
 
 
