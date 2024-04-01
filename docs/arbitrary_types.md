@@ -11,6 +11,7 @@ You can't save/load these via JSON, but you can use the other dataset types:
 ```python
 from tempfile import TemporaryDirectory
 from pydantic import BaseModel
+# from pydantic.v1 import BaseModel  # Pydantic V2
 from pydantic_kedro import PydanticZipDataset
 
 
@@ -92,6 +93,7 @@ Here's a example for [pandas](https://pandas.pydata.org/) and Pydantic V1:
 import pandas as pd
 from kedro_datasets.pandas import ParquetDataset
 from pydantic import validator
+# from pydantic.v1 import validator  # Pydantic V2
 from pydantic_kedro import ArbModel, PydanticZipDataset
 
 

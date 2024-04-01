@@ -4,8 +4,8 @@ from abc import abstractmethod
 from typing import Dict, List, Literal
 
 import pytest
-from pydantic import BaseModel
 
+from pydantic_kedro._pydantic import BaseModel
 from pydantic_kedro import load_model, save_model
 
 
@@ -60,7 +60,7 @@ def test_nested_subclass(
     """Test round-trip of objects with a nested subclass."""
     # Initial round-trip (should always work)
     save_model(obj, f"{tmpdir}/obj", format=format)
-    obj2 = load_model(f"{tmpdir}/obj", AbstractBaz)
+    obj2 = load_model(f"{tmpdir}/obj", AbstractBaz)  # type: ignore[type-abstract]
     assert obj.foo == obj2.foo
     assert obj.get_baz() == obj2.get_baz()
     # Nested round-trip (should also always work, but is more diffictult)

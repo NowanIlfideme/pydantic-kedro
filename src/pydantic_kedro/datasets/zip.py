@@ -8,9 +8,9 @@ from uuid import uuid4
 import fsspec
 from fsspec.implementations.zip import ZipFileSystem
 from kedro.io.core import AbstractDataset
-from pydantic import BaseModel
 
 from pydantic_kedro._local_caching import get_cache_dir
+from pydantic_kedro._pydantic import BaseModel
 
 from .folder import PydanticFolderDataset
 

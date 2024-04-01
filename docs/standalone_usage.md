@@ -8,6 +8,7 @@ You can use `pydantic-kedro` to save and load your Pydantic models without invok
 from tempfile import TemporaryDirectory
 
 from pydantic import BaseModel
+# from pydantic.v1 import BaseModel  # Pydantic V2
 from pydantic_kedro import load_model, save_model
 
 class MyModel(BaseModel):

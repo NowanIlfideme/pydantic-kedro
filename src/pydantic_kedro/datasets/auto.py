@@ -5,7 +5,8 @@ from typing import Any, Dict, Literal, Union
 import fsspec
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataset, get_protocol_and_path
-from pydantic import BaseModel
+
+from pydantic_kedro._pydantic import BaseModel
 
 from .folder import PydanticFolderDataset
 from .json import PydanticJsonDataset

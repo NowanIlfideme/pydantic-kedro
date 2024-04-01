@@ -3,8 +3,8 @@
 from typing import Literal, Type, TypeVar
 
 from kedro.io.core import AbstractDataset
-from pydantic import BaseModel
 
+from pydantic_kedro._pydantic import BaseModel
 from pydantic_kedro.datasets.auto import PydanticAutoDataset
 from pydantic_kedro.datasets.folder import PydanticFolderDataset
 from pydantic_kedro.datasets.json import PydanticJsonDataset

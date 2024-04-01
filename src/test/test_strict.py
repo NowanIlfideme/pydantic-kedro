@@ -1,10 +1,10 @@
 """Test strict models and BaseSettings subclasses."""
 
 import pytest
-from pydantic import BaseModel, BaseSettings
 from typing_extensions import Literal
 
 from pydantic_kedro import load_model, save_model
+from pydantic_kedro._pydantic import BaseModel, BaseSettings
 
 
 class ExSettings(BaseSettings):

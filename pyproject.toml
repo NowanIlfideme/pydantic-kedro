@@ -21,8 +21,8 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pydantic>=1.10.0,<2",   # TODO
-    "pydantic-yaml>=1.1.2",
+    "pydantic>=1.10.0,<3",   # WIP
+    "pydantic-yaml>=1.3.0",
     "ruamel-yaml<0.18",      # Current limitation
     "kedro>=0.19.3,<0.20",
     "kedro-datasets>=2.1.0",
@@ -72,6 +72,8 @@ version = { attr = "pydantic_kedro.version.__version__" }
 [tool.ruff]
 line-length = 105
 src = ["src"]
+
+[tool.ruff.lint]
 select = [
     "E", # pycodestyle
     "F", # pyflakes
@@ -80,7 +82,7 @@ select = [
 ]
 ignore = ["D203", "D213"] # conflicting
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 
@@ -121,4 +123,8 @@ module = [
     "ruamel.*",
     "kedro_datasets.*",
 ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pydantic.v1"]
 ignore_missing_imports = true

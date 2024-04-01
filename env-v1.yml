@@ -1,10 +1,10 @@
 # This is an example Conda environment, for local development
-name: pyd-kedro
+name: pyd-kedro-v1
 channels:
   - conda-forge
 dependencies:
   - python=3.9 # minimum targeted version is currently 3.9
   - pip
   - pip:
-      - pydantic>2,<3
+      - pydantic<2
       - -e ".[dev,docs]"
