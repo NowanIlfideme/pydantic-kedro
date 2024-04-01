@@ -72,6 +72,8 @@ version = { attr = "pydantic_kedro.version.__version__" }
 [tool.ruff]
 line-length = 105
 src = ["src"]
+
+[tool.ruff.lint]
 select = [
     "E", # pycodestyle
     "F", # pyflakes
@@ -80,7 +82,7 @@ select = [
 ]
 ignore = ["D203", "D213"] # conflicting
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 
