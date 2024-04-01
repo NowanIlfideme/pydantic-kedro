@@ -2,9 +2,10 @@
 
 from typing import Any, Callable, Dict, Type
 
-from kedro_datasets.pickle.pickle_dataset import PickleDataset
 from kedro.io.core import AbstractDataset
-from pydantic.v1 import BaseModel, create_model
+from kedro_datasets.pickle.pickle_dataset import PickleDataset
+
+from ._pydantic import BaseModel, create_model
 
 KLS_MARK_STR = "class"
 
@@ -122,7 +123,7 @@ def get_kedro_default(kls: Type[BaseModel]) -> Callable[[str], AbstractDataset]:
 def create_expanded_model(model: BaseModel) -> BaseModel:
     """Create an 'expanded' model with additional metadata."""
     pyd_kls = type(model)
-    if KLS_MARK_STR in pyd_kls.__fields__.keys():
+    if KLS_MARK_STR in pyd_kls.__fields__.keys():  # type: ignore
         raise ValueError(f"Marker {KLS_MARK_STR!r} already exists as a field; can't dump model.")
     pyd_kls_path = f"{pyd_kls.__module__}.{pyd_kls.__qualname__}"
 

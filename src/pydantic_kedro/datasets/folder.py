@@ -14,11 +14,11 @@ from fsspec import AbstractFileSystem
 from fsspec.core import strip_protocol
 from fsspec.implementations.local import LocalFileSystem
 from kedro.io.core import AbstractDataset, parse_dataset_definition
-from pydantic.v1 import BaseConfig, BaseModel, Extra, Field
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
 from pydantic_kedro._internals import get_kedro_default, get_kedro_map, import_string
 from pydantic_kedro._local_caching import get_cache_dir
+from pydantic_kedro._pydantic import BaseConfig, BaseModel, Extra, Field
 
 __all__ = ["PydanticFolderDataset"]
 

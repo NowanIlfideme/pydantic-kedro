@@ -8,10 +8,10 @@ import fsspec
 import ruamel.yaml as yaml
 from fsspec import AbstractFileSystem
 from kedro.io.core import AbstractDataset, get_filepath_str, get_protocol_and_path
-from pydantic.v1 import BaseModel
 from pydantic_yaml import to_yaml_file
 
 from pydantic_kedro._dict_io import PatchPydanticIter, dict_to_model
+from pydantic_kedro._pydantic import BaseModel
 
 
 class PydanticYamlDataset(AbstractDataset[BaseModel, BaseModel]):
